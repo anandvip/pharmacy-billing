@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f6b4a">
+<title>Counter Khata</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#6b736f;--line:#e3e1da;--pri:#0f6b4a;--pri2:#e7f3ed;--red:#b42318;--red2:#fdecea;--amb:#8a5a00;--amb2:#fff4d6;--rad:12px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+header.top{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
+header.top .t{flex:1;min-width:0}
+header.top b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header.top small{opacity:.85;font-size:12px}
+main{max-width:760px;margin:0 auto;padding:12px}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;border:0;background:none;padding:8px 2px 10px;font:inherit;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer}
+nav.tabs button .ic{font-size:19px;line-height:1.2}
+nav.tabs button.on{color:var(--pri);font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:12px;margin-bottom:12px}
+h2{font-size:12px;margin:0 0 8px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+h3{margin:0;font-size:18px}
+input,select,textarea{font:inherit;width:100%;padding:10px;border:1px solid #d4d1c8;border-radius:10px;background:#fff;color:inherit;min-height:42px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--pri);outline-offset:-1px}
+input[type=checkbox]{width:auto;min-height:0}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px}
+.hint{font-size:12px;color:var(--mute);margin-top:4px}
+.btn{font:inherit;border:1px solid #d4d1c8;background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer;color:var(--ink);min-height:42px}
+.btn.pri{background:var(--pri);border-color:var(--pri);color:#fff;font-weight:600}
+.btn.wa{background:#1f8f4e;border-color:#1f8f4e;color:#fff;font-weight:600}
+.btn.red{color:var(--red);border-color:#f0c4bf}
+.btn.sm{padding:6px 10px;font-size:13px;min-height:34px}
+.btn.link{border:0;background:none;color:var(--pri);padding:4px 0;min-height:0;font-weight:600}
+.btn.link.due{color:var(--red)}
+table.t td.nw{white-space:nowrap}
+.row{display:flex;gap:8px;align-items:center}
+.row>.grow{flex:1;min-width:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.list .it{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.list .it:last-child{border-bottom:0}
+.list .it>div:first-child{min-width:0}
+.mute{color:var(--mute);font-size:13px}
+.r{text-align:right}
+.due{color:var(--red);font-weight:700}
+.adv{color:var(--pri);font-weight:700}
+.chips{margin-top:10px}
+.chip{display:inline-block;padding:7px 11px;border-radius:20px;background:var(--pri2);color:var(--pri);margin:0 6px 6px 0;font:inherit;font-size:13px;border:0;cursor:pointer}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:10px;background:var(--amb2);color:var(--amb);margin-left:4px;vertical-align:middle;font-weight:600}
+.badge.red{background:var(--red2);color:var(--red)}
+.badge.grn{background:var(--pri2);color:var(--pri)}
+.banner{padding:10px 12px;border-radius:10px;margin-bottom:12px;font-size:14px;background:var(--amb2);color:#5c4100;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.banner.info{background:var(--pri2);color:#0b4a33}
+.line{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff}
+.stepper{display:flex;align-items:center;gap:4px}
+.stepper button{width:38px;height:38px;flex:0 0 38px;border-radius:50%;border:1px solid #d4d1c8;background:#fff;font-size:20px;cursor:pointer;color:var(--ink)}
+.stepper input{text-align:center;padding:6px;min-width:0}
+.tot{display:flex;justify-content:space-between;padding:3px 0;gap:10px}
+.tot.big{font-size:18px;font-weight:700;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:19px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:150px}
+.bars .b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--mute);height:100%}
+.bars .pair{display:flex;gap:3px;align-items:flex-end;width:100%;justify-content:center;flex:1}
+.bars i{display:block;width:38%;background:var(--pri);border-radius:3px 3px 0 0;min-height:2px}
+.bars i.c{background:#8cc9ad}
+.legend{font-size:12px;color:var(--mute);margin-top:6px}
+.legend span{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:-1px}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet{background:#fff;width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.ov{align-items:center}.sheet{border-radius:16px}}
+.sheet .hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:10px}
+.x{border:0;background:none;font-size:26px;line-height:1;color:var(--mute);cursor:pointer;padding:0 4px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts .btn{flex:1 1 auto}
+#toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#1d2421;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;z-index:60;opacity:0;transition:opacity .2s;pointer-events:none;max-width:92vw;text-align:center}
+#toast.on{opacity:1}
+.seg{display:flex;border:1px solid #d4d1c8;border-radius:10px;overflow:hidden}
+.seg button{flex:1;border:0;background:#fff;padding:10px;font:inherit;cursor:pointer;color:var(--ink)}
+.seg button.on{background:var(--pri);color:#fff;font-weight:600}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t td,table.t th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.t th{font-size:12px;color:var(--mute);font-weight:600}
+table.t .r{text-align:right;white-space:nowrap}
+table.t tr[data-act]{cursor:pointer}
+.void{text-decoration:line-through;opacity:.55}
+.empty{padding:14px;text-align:center;color:var(--mute)}
+.money-in{color:var(--pri)}
+.img-prev{width:100%;border:1px solid var(--line);border-radius:8px}
+#print-area{display:none}
+@media print{body>*:not(#print-area){display:none!important}#print-area{display:block!important}#print-area img{width:100%}body{padding:0;background:#fff}}
+</style>
+</head>
+<body>
+<header class="top"><div class="t"><b id="shopTitle">Counter Khata</b><small id="shopSub">Counter Khata</small></div></header>
+<main id="main"><p class="empty">Opening the khata…</p></main>
+<nav class="tabs" id="tabs"></nav>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="print-area"></div>
+<input type="file" id="f-restore" accept=".json,application/json" hidden>
+<input type="file" id="f-clients" accept=".csv,text/csv" hidden>
+<input type="file" id="f-stock" accept=".csv,text/csv" hidden>
+<noscript><p style="padding:20px">Counter Khata needs JavaScript turned on.</p></noscript>
+<script>
+'use strict';
+/* =========================================================
+   Counter Khata — offline day book for a pharmacy counter.
+   All data stays in this browser (IndexedDB). No server.
+   Money is kept in paise (integers) so totals never drift.
+   ========================================================= */
+const STORES=['settings','clients','meds','bills','payments','returns','rx'];
+const S={settings:null,clients:[],meds:[],bills:[],payments:[],returns:[],rx:[]};
+let db, persisted=false, pinUntil=0, pendingLogo=null;
+const C={cid:null,cart:[],paid:'',mode:'cash',date:null,edit:null};   // counter state
+const R={m:null};                                                        // reports state
+let view='counter', sub=null;
+
+/* ---------- small helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const pad=n=>String(n).padStart(2,'0');
+const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>dstr(new Date());                         // local date, not UTC
+const pd=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
+const addDays=(s,n)=>{const d=pd(s);d.setDate(d.getDate()+Math.round(n));return dstr(d)};
+const daysBetween=(a,b)=>Math.round((pd(b)-pd(a))/864e5);
+const ymOf=s=>s.slice(0,7);
+const thisYM=()=>today().slice(0,7);
+const monthEnd=m=>{const[y,mo]=m.split('-').map(Number);return dstr(new Date(y,mo,0))};
+const shiftYM=(m,k)=>{const[y,mo]=m.split('-').map(Number);const d=new Date(y,mo-1+k,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const mName=m=>{const[y,mo]=m.split('-').map(Number);return MON[mo-1]+' '+y};
+const sdate=s=>{if(!s)return'';const[y,m,d]=s.split('-');return `${+d} ${MON[+m-1]} ’${y.slice(2)}`};
+const fdate=s=>{if(!s)return'';const[y,m,d]=s.split('-');return `${+d} ${MON[+m-1]} ${y}`};
+const rs=p=>{p=Math.round(p||0);const neg=p<0;p=Math.abs(p);return(neg?'−':'')+'₹'+(p/100).toLocaleString('en-IN',{minimumFractionDigits:p%100?2:0,maximumFractionDigits:2})};
+const toP=v=>{const n=parseFloat(String(v??'').replace(/[₹,\s]/g,''));return isFinite(n)?Math.round(n*100):NaN};
+const rupees=p=>(Math.round(p||0)/100).toFixed(2);
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0};
+const int=v=>Math.max(0,Math.round(num(v)));
+const digits=s=>String(s||'').replace(/\D/g,'');
+const normPhone=s=>{let d=digits(s);if(d.length===12&&d.startsWith('91'))d=d.slice(2);if(d.length===11&&d.startsWith('0'))d=d.slice(1);return d};
+const waPhone=s=>{const d=normPhone(s);return d.length===10?'91'+d:''};
+
+const client=id=>S.clients.find(x=>x.id===id);
+const med=id=>S.meds.find(x=>x.id===id);
+const bill=id=>S.bills.find(x=>x.id===id);
+const billNo=id=>{const b=bill(id);return b?b.no:'?'};
+const medLabel=m=>m?(m.name+(m.strength?' '+m.strength:'')):'';
+const shopName=()=>S.settings.name||'Sample Medical Store';
+const cap=()=>num(S.settings.discCap);
+const hasSample=()=>STORES.some(s=>s!=='settings'&&S[s].some(x=>x.sample||x.practice));
+const isPractice=()=>!S.settings.name;   // anything typed before the real shop name is saved is practice
+const stockText=(tabs,tps)=>{tabs=Math.round(tabs||0);const neg=tabs<0;tabs=Math.abs(tabs);const s=Math.floor(tabs/tps),l=tabs%tps;let t=s+' strip'+(s===1?'':'s');if(l)t+=' + '+l;return(neg?'−':'')+t};
+const qtyText=it=>{const p=[];if(it.strips)p.push(it.strips+' strip'+(it.strips>1?'s':''));if(it.loose)p.push(it.loose+' tab');return p.join(' + ')||'0'};
+
+function toast(msg,ms=2800){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('on'),ms)}
+
+/* ---------- IndexedDB ---------- */
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('counter-khata',1);r.onupgradeneeded=()=>{const d=r.result;STORES.forEach(s=>{if(!d.objectStoreNames.contains(s))d.createObjectStore(s,{keyPath:'id'})})};r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('blocked'))})}
+function getAll(s){return new Promise((res,rej)=>{const q=db.transaction(s).objectStore(s).getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}
+/* one atomic transaction for every save: bill + stock + payment succeed or fail together */
+function commit(ops){return new Promise((res,rej)=>{const stores=[...new Set(ops.map(o=>o.store))];const t=db.transaction(stores,'readwrite');for(const o of ops){const os=t.objectStore(o.store);if(o.clear)os.clear();else if(o.del!=null)os.delete(o.del);else os.put(o.value)}t.oncomplete=()=>{ops.forEach(applyMem);res()};t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error||new Error('Save was cancelled'))})}
+function applyMem(o){if(o.store==='settings'){if(o.value)S.settings=o.value;return}const a=S[o.store];if(o.clear){a.length=0;return}if(o.del!=null){const i=a.findIndex(x=>x.id===o.del);if(i>=0)a.splice(i,1);return}const i=a.findIndex(x=>x.id===o.value.id);if(i>=0)a[i]=o.value;else a.push(o.value)}
+
+/* ---------- PIN (soft lock, hashed, never stored as plain text) ---------- */
+async function hashPin(pin,algo){algo=algo||(window.crypto&&crypto.subtle?'sha256':'djb2');const s='ck-pin:'+pin;if(algo==='sha256'){if(!(window.crypto&&crypto.subtle))throw new Error('PIN check needs the https page');const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return'sha256:'+[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}let h=5381;for(const c of s)h=(h*33+c.charCodeAt(0))>>>0;return'djb2:'+h.toString(16)}
+async function pinOk(pin){const st=S.settings.pinHash||'';try{return(await hashPin(pin,st.split(':')[0]))===st}catch(e){toast(e.message);return false}}
+
+/* ---------- money logic ---------- */
+function lineCalc(l){const tps=Math.max(1,int(l.tps));const tablets=int(l.strips)*tps+int(l.loose);const gross=Math.round(l.mrp*tablets/l.medTps);const disc=Math.round(gross*num(l.disc)/100);return{tablets,gross,disc,net:gross-disc}}
+function billCalc(lines){let gross=0,disc=0,net=0;for(const l of lines){const c=lineCalc(l);gross+=c.gross;disc+=c.disc;net+=c.net}const total=Math.round(net/100)*100;return{gross,disc,net,roundOff:total-net,total}}
+const linkedPay=bid=>S.payments.find(p=>p.billId===bid&&!p.voided);
+const billReturns=bid=>S.returns.filter(r=>r.billId===bid&&!r.voided);
+const returnedTabs=(bid,mid)=>billReturns(bid).reduce((s,r)=>s+r.items.filter(i=>i.medId===mid).reduce((a,i)=>a+i.tablets,0),0);
+
+/* balances for every client in one pass (optionally as of a date) */
+function balances(upto){const m={};const add=(c,v)=>{if(c)m[c]=(m[c]||0)+v};for(const c of S.clients)if(!upto||(c.openingDate||'')<=upto)add(c.id,c.openingBal||0);for(const b of S.bills)if(!b.voided&&(!upto||b.date<=upto))add(b.clientId,b.total);for(const r of S.returns)if(!r.voided&&(!upto||r.date<=upto))add(r.clientId,-r.total);for(const p of S.payments)if(!p.voided&&(!upto||p.date<=upto))add(p.clientId,-p.amount);return m}
+const balance=cid=>balances()[cid]||0;
+
+/* khata entries oldest → newest with running balance. Nothing is stored as a total; it is always recomputed,
+   so correcting an old bill automatically corrects every later month. */
+function ledger(cid){const c=client(cid);const E=[];
+ if(c&&c.openingBal)E.push({date:c.openingDate||'0000-00-00',k:0,kind:'open',text:'Opening balance (paper book)',amt:c.openingBal,t:0});
+ for(const b of S.bills)if(b.clientId===cid&&!b.voided)E.push({date:b.date,k:1,kind:'bill',text:`Bill #${b.no} · ${b.items.length} item${b.items.length>1?'s':''}`,amt:b.total,ref:b.id,t:b.createdAt});
+ for(const r of S.returns)if(r.clientId===cid&&!r.voided)E.push({date:r.date,k:2,kind:'ret',text:`Return on bill #${billNo(r.billId)}`,amt:-r.total,ref:r.id,t:r.createdAt});
+ for(const p of S.payments)if(p.clientId===cid&&!p.voided)E.push({date:p.date,k:3,kind:'pay',text:`Received · ${p.mode==='upi'?'UPI':'Cash'}${p.billId?' (with bill #'+billNo(p.billId)+')':''}${p.note?' · '+p.note:''}`,amt:-p.amount,ref:p.id,t:p.createdAt});
+ E.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.k-b.k)||(a.t-b.t));
+ let bal=0;for(const e of E){bal+=e.amt;e.bal=bal}return E}
+
+/* month bill: brought forward + medicines − returns − received = closing due */
+function statement(cid,m){const start=m+'-01',end=monthEnd(m);let bf=0,open=0,meds=0,rets=0,paid=0;const rows=[];
+ for(const e of ledger(cid)){if(e.date<start){bf+=e.amt;continue}if(e.date>end)continue;rows.push(e);
+  if(e.kind==='open')open+=e.amt;else if(e.kind==='bill')meds+=e.amt;else if(e.kind==='ret')rets-=e.amt;else paid-=e.amt}
+ return{bf,open,meds,rets,paid,closing:bf+open+meds-rets-paid,rows,start,end}}
+
+/* refill & stash: tablets bought ÷ dose per day, chained purchase after purchase */
+function coverage(r){const purchases=[];
+ for(const b of S.bills){if(b.voided||b.clientId!==r.clientId)continue;for(const it of b.items)if(it.medId===r.medId){const tabs=it.tablets-returnedTabs(b.id,it.medId);if(tabs>0)purchases.push({date:b.date,tabs})}}
+ purchases.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+ if(!(num(r.dose)>0))return{due:null,ahead:0,stash:false,last:null};
+ let end=null;for(const p of purchases){const st=end&&end>p.date?end:p.date;end=addDays(st,p.tabs/num(r.dose))}
+ const due=end||r.startDate||today();const ahead=daysBetween(today(),due);
+ return{due,ahead,stash:ahead>45,last:purchases.length?purchases[purchases.length-1].date:null}}
+function dueText(cv){if(!cv.due)return'';const d=cv.ahead;if(d<0)return`<span class="badge red">overdue ${-d} day${d===-1?'':'s'}</span>`;if(d===0)return'<span class="badge red">due today</span>';if(d<=3)return`<span class="badge">due in ${d} day${d===1?'':'s'}</span>`;return`<span class="mute">next ${fdate(cv.due)}</span>`}
+
+/* ---------- modals ---------- */
+function modal(title,html){const ov=document.createElement('div');ov.className='ov';ov.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="hd"><h3>${esc(title)}</h3><button class="x" data-close aria-label="Close">×</button></div>${html}</div>`;ov.addEventListener('click',e=>{if(e.target.closest('[data-close]'))closeModal(ov)});document.body.appendChild(ov);const f=ov.querySelector('input:not([type=hidden]):not([type=file]),select');if(f&&!f.dataset.nofocus)setTimeout(()=>f.focus(),60);return ov}
+function closeModal(ov){ov=ov||[...document.querySelectorAll('.ov')].pop();if(!ov)return;ov.remove();if(ov._onClose)ov._onClose()}
+function closeAll(){document.querySelectorAll('.ov').forEach(o=>closeModal(o))}
+function confirmBox(msg,ok='Yes',danger=false){return new Promise(res=>{const ov=modal('Please confirm',`<p>${msg}</p><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn ${danger?'red':'pri'}" id="cfOk">${esc(ok)}</button></div>`);let done=false;ov._onClose=()=>{if(!done)res(false)};$('#cfOk',ov).onclick=()=>{done=true;ov.remove();res(true)}})}
+function askPin(why){if(Date.now()<pinUntil)return Promise.resolve(true);return new Promise(res=>{const ov=modal('Pharmacist PIN',`<p class="mute">${esc(why)}</p><input id="pinIn" type="password" inputmode="numeric" autocomplete="off" maxlength="8" aria-label="PIN"><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="pinOk">Unlock</button></div><p class="hint">Stays unlocked for 5 minutes.</p>`);const inp=$('#pinIn',ov);let done=false;ov._onClose=()=>{if(!done)res(false)};const go=async()=>{if(await pinOk(inp.value.trim())){done=true;pinUntil=Date.now()+5*60e3;ov.remove();res(true)}else{inp.value='';inp.focus();toast('Wrong PIN')}};$('#pinOk',ov).onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()}})}
+
+/* ---------- render shell ---------- */
+const TABS=[['counter','🧾','Counter'],['clients','📒','Clients'],['stock','💊','Stock'],['reports','📊','Reports'],['shop','🏪','Shop']];
+function go(v,s=null){view=v;sub=s;render();window.scrollTo(0,0)}
+function render(){
+ $('#shopTitle').textContent=shopName()+(S.settings.name?'':' (practice)');
+ $('#shopSub').textContent='Counter Khata'+(S.settings.counter?' · '+S.settings.counter:'');
+ $('#tabs').innerHTML=TABS.map(([k,ic,l])=>`<button data-act="tab" data-v="${k}" class="${view===k?'on':''}" aria-current="${view===k?'page':'false'}"><span class="ic">${ic}</span>${l}</button>`).join('');
+ const m=$('#main');
+ const html={counter:vCounter,clients:sub?vKhata:vClients,stock:vStock,reports:vReports,shop:vShop}[view]();
+ m.innerHTML=banners()+html;
+ if(view==='counter')fillCounter();
+ if(view==='clients'&&!sub)fillClientList();
+ if(view==='stock')fillStock();
+}
+function banners(){let h='';
+ if(hasSample())h+=S.settings.name?`<div class="banner"><span>Practice records are still on this phone.</span><button class="btn sm" data-act="clearSample">Clear them</button></div>`:`<div class="banner"><span><b>Practice mode.</b> Sample shop and clients. Save your real shop name under Shop to begin.</span><button class="btn sm" data-act="tab" data-v="shop">Shop</button></div>`;
+ const real=S.bills.some(b=>!b.sample&&!b.practice)||S.clients.some(c=>!c.sample&&!c.practice);
+ const lb=S.settings.lastBackup;
+ if(real&&(!lb||Date.now()-lb>7*864e5))h+=`<div class="banner"><span>Last backup: <b>${lb?fdate(dstr(new Date(lb))):'never'}</b>. If this phone is lost, the khata goes with it.</span><button class="btn sm" data-act="backupJson">Back up</button></div>`;
+ return h}
+
+/* =================== COUNTER =================== */
+function vCounter(){const eb=C.edit&&bill(C.edit);
+ return(eb?`<div class="banner info"><span>Editing <b>bill #${eb.no}</b>. Save to replace it.</span><button class="btn sm" data-act="cancelEdit">Cancel edit</button></div>`:'')+
+ `<div class="card" id="c-client"></div><div id="c-add"></div><div id="c-cart"></div><div class="card" id="c-today"></div>`}
+function fillCounter(){fillCClient();fillCAdd();renderCart();fillToday()}
+function fillCClient(){const el=$('#c-client');if(!el)return;
+ if(!C.cid){
+  el.innerHTML=`<h2>Who is buying?</h2><input id="cq" placeholder="Client name or phone" autocomplete="off" aria-label="Search client"><div id="cq-res" class="list"></div>
+  <div class="acts"><button class="btn" data-act="walkin">Walk-in cash sale</button><button class="btn" data-act="newClient" data-from="counter">+ New client</button></div>
+  <h2 style="margin-top:16px">Refills due (next 3 days)</h2><div class="list">${refillList()}</div>`;return}
+ if(C.cid==='walkin'){el.innerHTML=`<div class="row"><div class="grow"><h3>Walk-in customer</h3><div class="mute">Cash sale, paid in full. Not added to any khata.</div></div><button class="btn sm" data-act="changeClient">Change</button></div>`;return}
+ const c=client(C.cid);if(!c){C.cid=null;return fillCClient()}
+ const pend=pendingNow();const rx=S.rx.filter(r=>r.clientId===c.id&&r.active!==false);
+ const bought={};for(const b of S.bills)if(b.clientId===c.id&&!b.voided)for(const it of b.items)bought[it.medId]=(bought[it.medId]||0)+1;
+ const extra=Object.keys(bought).filter(id=>!rx.some(r=>r.medId===id)&&med(id)&&!med(id).archived).sort((a,b)=>bought[b]-bought[a]).slice(0,4);
+ const last=lastBill(c.id);
+ el.innerHTML=`<div class="row"><div class="grow"><h3>${esc(c.name)}</h3><div class="mute">${esc(c.phone||'no phone')}${c.address?' · '+esc(c.address):''}</div></div>
+  <div class="r"><div class="mute">Pending khata</div><button class="btn link ${pend>0?'due':''}" data-act="openKhata" data-id="${c.id}">${rs(pend)} ›</button></div></div>
+  <div class="chips">${rx.map(r=>{const m=med(r.medId);if(!m)return'';const cv=coverage(r);return`<button class="chip" data-act="addMed" data-id="${m.id}" data-n="${int(r.usual)||1}">+ ${esc(medLabel(m))} ×${int(r.usual)||1} ${cv.ahead<=3&&cv.due?'⏰':''}</button>`}).join('')}${extra.map(id=>`<button class="chip" data-act="addMed" data-id="${id}" data-n="1">+ ${esc(medLabel(med(id)))}</button>`).join('')}</div>
+  <div class="acts">${last?`<button class="btn" data-act="repeatLast">Repeat last bill (${fdate(last.date)})</button>`:''}<button class="btn sm" data-act="changeClient">Change client</button></div>`}
+function refillList(){const rows=[];for(const r of S.rx){if(r.active===false)continue;const c=client(r.clientId),m=med(r.medId);if(!c||!m)continue;const cv=coverage(r);if(cv.due&&cv.ahead<=3)rows.push({r,c,m,cv})}
+ rows.sort((a,b)=>a.cv.ahead-b.cv.ahead);
+ return rows.length?rows.map(x=>`<div class="it" data-act="refill" data-id="${x.r.id}"><div><b>${esc(x.c.name)}</b><div class="mute">${esc(medLabel(x.m))} ×${int(x.r.usual)||1}</div></div><div class="r">${dueText(x.cv)}</div></div>`).join(''):'<div class="empty">Nothing due. Add prescriptions on a client’s khata to see refills here.</div>'}
+function lastBill(cid){return S.bills.filter(b=>b.clientId===cid&&!b.voided).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.createdAt-a.createdAt)[0]}
+function fillCAdd(){const el=$('#c-add');if(!el)return;if(!C.cid){el.innerHTML='';return}
+ el.innerHTML=`<div class="card"><h2>Add medicine</h2><input id="mq" placeholder="Search stock by name or salt" autocomplete="off" aria-label="Search stock"><div id="mq-res" class="list"></div></div>`}
+function searchMeds(q){q=q.trim().toLowerCase();if(!q)return[];return S.meds.filter(m=>!m.archived&&(medLabel(m).toLowerCase().includes(q)||(m.salt||'').toLowerCase().includes(q))).slice(0,8)}
+function medRow(m,act='addMed'){const low=m.stockTab<(num(m.minStrips??S.settings.lowStrips))*m.tps;return`<div class="it" data-act="${act}" data-id="${m.id}" data-n="1"><div><b>${esc(medLabel(m))}</b><div class="mute">${esc(m.salt||'')} · ${m.tps}/strip · ${rs(m.mrp)}/strip${m.disc?' · '+m.disc+'% off':''}</div></div><div class="r mute">${stockText(m.stockTab,m.tps)}${m.stockTab<=0?'<span class="badge red">out</span>':low?'<span class="badge">low</span>':''}${expBadge(m)}</div></div>`}
+function expBadge(m){if(!m.expiry)return'';if(m.expiry<thisYM())return'<span class="badge red">expired</span>';if(m.expiry<=ymOf(addDays(today(),60)))return`<span class="badge">exp ${mName(m.expiry)}</span>`;return''}
+function pendingNow(){if(!C.cid||C.cid==='walkin')return 0;let b=balance(C.cid);if(C.edit){const ob=bill(C.edit);if(ob&&!ob.voided){b-=ob.total;const op=linkedPay(ob.id);if(op)b+=op.amount}}return b}
+function shelfFor(l){const m=med(l.medId);let s=m?m.stockTab:0;if(C.edit){const ob=bill(C.edit);if(ob)for(const it of ob.items)if(it.medId===l.medId)s+=it.tablets}return s}
+
+function renderCart(){const el=$('#c-cart');if(!el)return;if(!C.cid){el.innerHTML='';return}
+ if(!C.cart.length){el.innerHTML='<div class="card empty">No medicines yet. Tap a usual medicine above, repeat the last bill, or search stock.</div>';return}
+ const capV=cap();
+ const lines=C.cart.map((l,i)=>{const c=lineCalc(l);const shelf=shelfFor(l);const m=med(l.medId);
+  return`<div class="line"><div class="row"><div class="grow"><b>${esc(l.name)}</b><div class="mute">${esc(l.salt||'')} · MRP ${rs(l.mrp)} per strip of ${l.medTps}</div></div><button class="x" data-act="rmLine" data-i="${i}" aria-label="Remove">×</button></div>
+  <div class="grid2"><div><label>Strips</label><div class="stepper"><button data-act="dec" data-i="${i}" aria-label="One strip less">−</button><input data-f="strips" data-i="${i}" value="${int(l.strips)}" inputmode="numeric" aria-label="Strips"><button data-act="inc" data-i="${i}" aria-label="One strip more">+</button></div></div>
+  <div><label>Loose tablets</label><input data-f="loose" data-i="${i}" value="${int(l.loose)||''}" placeholder="0" inputmode="numeric"></div>
+  <div><label>Tablets in one strip</label><input data-f="tps" data-i="${i}" value="${l.tps}" inputmode="numeric"></div>
+  <div><label>Discount % (max ${capV})</label><input data-f="disc" data-i="${i}" value="${num(l.disc)}" inputmode="decimal"></div></div>
+  <div class="tot" style="margin-top:8px"><span class="mute">${c.tablets} tablets · ${rs(c.gross)}${c.disc?' − '+rs(c.disc):''}</span><b>${rs(c.net)}</b></div>
+  ${c.tablets>shelf?`<div class="hint" style="color:var(--red)">Shelf shows only ${stockText(shelf,l.medTps)}. You can still save; please recount.</div>`:''}${m?expBadge(m):''}</div>`}).join('');
+ const t=billCalc(C.cart);const walk=C.cid==='walkin';const pend=pendingNow();
+ if(!C.date)C.date=today();
+ el.innerHTML=`<div class="card"><h2>Bill</h2>${lines}
+ <div class="tot"><span>MRP total</span><span>${rs(t.gross)}</span></div>
+ <div class="tot"><span>Discount</span><span>−${rs(t.disc)}</span></div>
+ ${t.roundOff?`<div class="tot"><span>Round off</span><span>${t.roundOff>0?'+':''}${rs(t.roundOff)}</span></div>`:''}
+ <div class="tot big"><span>Bill total</span><span>${rs(t.total)}</span></div>
+ ${walk?'':`<div class="tot"><span>Old pending on khata</span><span class="${pend>0?'due':''}">${rs(pend)}</span></div>`}
+ <div class="grid2"><div><label>Received now (₹)</label><input id="paid" value="${esc(C.paid)}" placeholder="${walk?(t.total/100):'0 = nothing paid'}" inputmode="decimal"></div>
+ <div><label>Bill date</label><input type="date" id="bdate" value="${C.date}" max="${today()}"></div></div>
+ <label>Paid by</label><div class="seg" role="group"><button data-act="mode" data-v="cash" class="${C.mode==='cash'?'on':''}">Cash</button><button data-act="mode" data-v="upi" class="${C.mode==='upi'?'on':''}">UPI</button></div>
+ <div id="newbal">${newBalHtml()}</div>
+ <div class="acts"><button class="btn pri" data-act="saveBill">${C.edit?'Save changes':'Save'}</button><button class="btn wa" data-act="saveBill" data-share="1">Save &amp; WhatsApp</button></div>
+ ${walk?'':'<p class="hint">Whatever is not paid stays on the khata and carries into next month. It is never wiped at month end.</p>'}${C.date<today()?`<p class="hint">Old paper entry: this bill will count in <b>${mName(ymOf(C.date))}</b>.</p>`:''}</div>`}
+function newBalHtml(){const t=billCalc(C.cart);const walk=C.cid==='walkin';const ps=String(C.paid).trim();const paid=ps===''?(walk?t.total:0):toP(ps);
+ if(isNaN(paid))return'<div class="hint" style="color:var(--red)">Received amount is not a number.</div>';
+ if(walk){return paid>=t.total?`<div class="tot big"><span>Return change</span><span>${rs(paid-t.total)}</span></div>`:`<div class="hint" style="color:var(--red)">Walk-in sale must be paid in full (${rs(t.total)}). Pick a client to give on credit.</div>`}
+ const after=pendingNow()+t.total-paid;return`<div class="tot big"><span>Khata after this bill</span><span class="${after>0?'due':after<0?'adv':''}">${after<0?rs(-after)+' advance':rs(after)}</span></div>`}
+function fillToday(){const el=$('#c-today');if(!el)return;const T=today();const list=S.bills.filter(b=>dstr(new Date(b.createdAt))===T||b.date===T).sort((a,b)=>b.createdAt-a.createdAt);
+ const sum=list.filter(b=>!b.voided).reduce((s,b)=>s+b.total,0);const got=S.payments.filter(p=>!p.voided&&(p.date===T)).reduce((s,p)=>s+p.amount,0);
+ el.innerHTML=`<h2>Today at the counter</h2><div class="tot"><span>${list.filter(b=>!b.voided).length} bills · ${rs(sum)}</span><span class="money-in">Received ${rs(got)}</span></div><div class="list">${list.slice(0,15).map(b=>{const c=client(b.clientId);return`<div class="it ${b.voided?'void':''}" data-act="openBill" data-id="${b.id}"><div><b>#${b.no}</b> ${esc(c?c.name:'Walk-in')}<div class="mute">${b.date!==T?'dated '+fdate(b.date)+' · ':''}${b.items.length} item${b.items.length>1?'s':''}</div></div><div class="r">${rs(b.total)}</div></div>`}).join('')||'<div class="empty">No bills yet today.</div>'}</div>`}
+
+function addToCart(medId,n=1,o={}){const m=med(medId);if(!m)return toast('That medicine is not in the stock list');
+ const ex=C.cart.find(l=>l.medId===medId);
+ if(ex&&!o.replace){ex.strips=int(ex.strips)+n}
+ else{const r=C.cid&&C.cid!=='walkin'?S.rx.find(x=>x.clientId===C.cid&&x.medId===medId&&x.active!==false):null;
+  let disc=o.disc!=null?o.disc:(r&&r.disc!=null&&r.disc!==''?r.disc:(m.disc||0));disc=Math.min(num(disc),cap());
+  const line={medId,name:medLabel(m),salt:m.salt||'',mrp:m.mrp,medTps:m.tps,tps:o.tps||(r&&int(r.tps)?int(r.tps):m.tps),strips:n,loose:o.loose||0,disc};
+  if(ex)Object.assign(ex,line);else C.cart.push(line)}
+ renderCart()}
+function resetCounter(){C.cid=null;C.cart=[];C.paid='';C.mode='cash';C.date=today();C.edit=null}
+
+async function saveBill(share){
+ if(!C.cid)return toast('Pick a client or walk-in first');
+ if(!C.cart.length)return toast('Add at least one medicine');
+ for(const l of C.cart){const c=lineCalc(l);if(c.tablets<=0)return toast(`${l.name}: quantity is zero`);if(num(l.disc)>cap())return toast(`${l.name}: discount is above the ${cap()}% cap`)}
+ const date=C.date||today();if(date>today())return toast('Bill date cannot be in the future');
+ const t=billCalc(C.cart);const walk=C.cid==='walkin';const ps=String(C.paid).trim();
+ let paid=ps===''?(walk?t.total:0):toP(ps);
+ if(isNaN(paid)||paid<0)return toast('Received amount is not a valid number');
+ if(walk){if(paid<t.total)return toast('Walk-in sale must be paid in full. Pick a client to give on credit.');paid=t.total}
+ const old=C.edit?bill(C.edit):null;
+ if(old&&ymOf(old.date)<thisYM()&&!(await confirmBox(`Bill #${old.no} is from <b>${mName(ymOf(old.date))}</b>. Changing it will also change that month’s statement and every closing after it. Continue?`,'Change it')))return;
+ const ops=[];const st={...S.settings};
+ const b={id:old?old.id:uid(),no:old?old.no:(st.billSeq=(int(st.billSeq))+1),clientId:walk?null:C.cid,date,
+  items:C.cart.map(l=>{const c=lineCalc(l);return{medId:l.medId,name:l.name,salt:l.salt,mrp:l.mrp,medTps:l.medTps,tps:Math.max(1,int(l.tps)),strips:int(l.strips),loose:int(l.loose),disc:num(l.disc),tablets:c.tablets,gross:c.gross,discAmt:c.disc,net:c.net}}),
+  gross:t.gross,disc:t.disc,roundOff:t.roundOff,total:t.total,voided:false,createdAt:old?old.createdAt:Date.now(),editedAt:old?Date.now():null,sample:old?!!old.sample:false,practice:isPractice()};
+ if(!old)ops.push({store:'settings',value:st});
+ const delta={};if(old)for(const it of old.items)delta[it.medId]=(delta[it.medId]||0)+it.tablets;
+ for(const it of b.items)delta[it.medId]=(delta[it.medId]||0)-it.tablets;
+ const short=[];for(const[mid,dv]of Object.entries(delta)){if(!dv)continue;const m=med(mid);if(!m)continue;const nm={...m,stockTab:(m.stockTab||0)+dv};if(nm.stockTab<0)short.push(medLabel(m));ops.push({store:'meds',value:nm})}
+ const op=old?linkedPay(old.id):null;
+ if(paid>0)ops.push({store:'payments',value:{id:op?op.id:uid(),clientId:b.clientId,date,amount:paid,mode:C.mode,billId:b.id,note:'',voided:false,createdAt:op?op.createdAt:Date.now()+1,sample:op?!!op.sample:false,practice:isPractice()}});
+ else if(op)ops.push({store:'payments',value:{...op,voided:true}});
+ ops.push({store:'bills',value:b});
+ try{await commit(ops)}catch(e){return toast('Could not save: '+e.message)}
+ resetCounter();render();
+ toast((old?`Bill #${b.no} updated`:`Bill #${b.no} saved`)+(short.length?` · Shelf went below zero for ${short.join(', ')}. Please recount.`:''),short.length?5000:2800);
+ if(share)shareBill(b.id)}
+
+/* =================== CLIENTS & KHATA =================== */
+function vClients(){const bal=balances();const tot=S.clients.reduce((s,c)=>s+Math.max(0,bal[c.id]||0),0);
+ return`<div class="row" style="margin-bottom:8px"><input id="clq" class="grow" placeholder="Search name or phone" autocomplete="off" aria-label="Search clients"><button class="btn pri" data-act="newClient">+ New client</button></div>
+ <p class="mute">${S.clients.length} clients · total pending <b class="due">${rs(tot)}</b></p><div class="card list" id="cl-res"></div>`}
+function fillClientList(q=''){const el=$('#cl-res');if(!el)return;const bal=balances();q=q.trim().toLowerCase();const qd=digits(q);
+ const list=S.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>(bal[b.id]||0)-(bal[a.id]||0)||a.name.localeCompare(b.name));
+ el.innerHTML=list.map(c=>{const v=bal[c.id]||0;return`<div class="it" data-act="openKhata" data-id="${c.id}"><div><b>${esc(c.name)}</b><div class="mute">${esc(c.phone||'no phone')}</div></div><div class="r ${v>0?'due':v<0?'adv':'mute'}">${v<0?rs(-v)+' adv':rs(v)}</div></div>`}).join('')||'<div class="empty">No clients found.</div>'}
+function vKhata(){const c=client(sub);if(!c){sub=null;return vClients()}
+ const E=ledger(c.id);const bal=E.length?E[E.length-1].bal:0;
+ const rx=S.rx.filter(r=>r.clientId===c.id).sort((a,b)=>(b.active!==false)-(a.active!==false));
+ return`<button class="btn sm" data-act="tab" data-v="clients">← All clients</button>
+ <div class="card" style="margin-top:10px"><div class="row"><div class="grow"><h3>${esc(c.name)}</h3><div class="mute">${c.phone?`<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`:'no phone'}${c.address?' · '+esc(c.address):''}</div></div>
+ <div class="r"><div class="mute">${bal<0?'Advance':'Pending'}</div><div class="${bal>0?'due':'adv'}" style="font-size:22px">${rs(Math.abs(bal))}</div></div></div>
+ <div class="acts"><button class="btn pri" data-act="billFor" data-id="${c.id}">New bill</button><button class="btn" data-act="payFor" data-id="${c.id}">Amount received</button><button class="btn" data-act="monthBill" data-id="${c.id}">Month bill</button></div>
+ <div class="acts" style="margin-top:6px"><button class="btn sm" data-act="rxNew" data-id="${c.id}">+ Add prescription</button><button class="btn sm" data-act="editClient" data-id="${c.id}">Edit client</button></div></div>
+ <div class="card"><h2>Repeat medicines</h2><div class="list">${rx.map(r=>{const m=med(r.medId);const cv=coverage(r);return`<div class="it" data-act="rxEdit" data-id="${r.id}"><div><b class="${r.active===false?'void':''}">${esc(m?medLabel(m):'(removed medicine)')}</b><div class="mute">${num(r.dose)} tab/day · usual ${int(r.usual)||1} strip${int(r.usual)>1?'s':''}${r.tps?' of '+r.tps:''}${r.disc!=null&&r.disc!==''?' · '+r.disc+'% off':''}${r.doctor?' · Dr '+esc(r.doctor):''}</div></div><div class="r">${r.active===false?'<span class="mute">stopped</span>':dueText(cv)}${cv.stash&&r.active!==false?`<div><span class="badge">stocking up · covered ${cv.ahead} days</span></div>`:''}</div></div>`}).join('')||'<div class="empty">No prescriptions yet.</div>'}</div></div>
+ <div class="card"><h2>Khata · newest first</h2>${E.length?`<table class="t"><thead><tr><th>Date</th><th>Entry</th><th class="r">Amount</th><th class="r">Balance</th></tr></thead><tbody>${E.slice().reverse().map(e=>`<tr data-act="entry" data-kind="${e.kind}" data-id="${e.ref||c.id}"><td class="nw">${sdate(e.date)}</td><td>${esc(e.text)}</td><td class="r ${e.amt<0?'money-in':''}">${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}</td><td class="r">${rs(e.bal)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Nothing on this khata yet.</div>'}</div>`}
+
+function clientForm(c,from){const isNew=!c;c=c||{name:'',phone:'',address:'',openingBal:0,openingDate:today()};
+ const ov=modal(isNew?'New client':'Edit client',`<label>Name *</label><input id="f-name" value="${esc(c.name)}" autocomplete="off">
+ <label>Phone (10 digits)</label><input id="f-phone" value="${esc(c.phone)}" inputmode="tel" autocomplete="off">
+ <label>Address</label><input id="f-addr" value="${esc(c.address)}">
+ <div class="grid2"><div><label>Opening balance (₹)</label><input id="f-ob" value="${c.openingBal?c.openingBal/100:''}" placeholder="0" inputmode="decimal"></div><div><label>As on date</label><input type="date" id="f-od" value="${c.openingDate||today()}" max="${today()}"></div></div>
+ <p class="hint">Copy the balance from the paper book as on this date. Do not also enter the old bills before this date, or they will count twice. Use a minus sign for advance.</p>
+ <div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="f-save">Save client</button></div>`);
+ $('#f-save',ov).onclick=async()=>{const name=$('#f-name',ov).value.trim();const phone=normPhone($('#f-phone',ov).value);const ob=$('#f-ob',ov).value.trim()===''?0:toP($('#f-ob',ov).value);const od=$('#f-od',ov).value||today();
+  if(!name)return toast('Name is needed');if(phone&&phone.length!==10)return toast('Phone should be 10 digits');if(isNaN(ob))return toast('Opening balance is not a number');if(od>today())return toast('Date cannot be in the future');
+  const dup=phone&&S.clients.find(x=>x.phone===phone&&(!c.id||x.id!==c.id));if(dup)return toast(`${dup.name} already has this phone number`);
+  if(!isNew&&(ob!==(c.openingBal||0)||od!==c.openingDate)&&!(await askPin('Changing the opening balance changes every month after it.')))return;
+  const v={...c,id:c.id||uid(),name,phone,address:$('#f-addr',ov).value.trim(),openingBal:ob,openingDate:od,createdAt:c.createdAt||Date.now(),sample:!!c.sample,practice:c.id?!!c.practice:isPractice()};
+  await commit([{store:'clients',value:v}]);closeModal(ov);toast(isNew?'Client added':'Client updated');
+  if(from==='counter'){C.cid=v.id;go('counter')}else if(isNew)go('clients',v.id);else render()}}
+
+function payForm(cid,p){const c=client(cid);const isNew=!p;p=p||{amount:0,mode:'cash',date:today(),note:''};const bal=balance(cid);
+ const ov=modal(isNew?'Amount received':'Payment',`<p><b>${esc(c.name)}</b> · pending <span class="${bal>0?'due':''}">${rs(bal)}</span></p>
+ <label>Amount (₹)</label><input id="p-amt" value="${p.amount?p.amount/100:''}" inputmode="decimal" ${isNew?'':'disabled'}>
+ <label>Paid by</label><div class="seg" id="p-mode"><button data-v="cash" class="${p.mode==='cash'?'on':''}">Cash</button><button data-v="upi" class="${p.mode==='upi'?'on':''}">UPI</button></div>
+ <div class="grid2"><div><label>Date</label><input type="date" id="p-date" value="${p.date}" max="${today()}" ${isNew?'':'disabled'}></div><div><label>Note</label><input id="p-note" value="${esc(p.note||'')}" placeholder="optional" ${isNew?'':'disabled'}></div></div>
+ <div id="p-after" class="tot big"></div>
+ <p class="hint">This goes against the running balance, not against one medicine.</p>
+ <div class="acts">${isNew?`<button class="btn" data-close>Cancel</button><button class="btn pri" id="p-save">Save payment</button>`:(p.billId?`<p class="mute">This came with bill #${billNo(p.billId)}. Change it from the bill.</p>`:`<button class="btn red" id="p-del">Delete payment</button>`)}</div>`);
+ let mode=p.mode;$('#p-mode',ov).onclick=e=>{const b=e.target.closest('button');if(!b||!isNew)return;mode=b.dataset.v;ov.querySelectorAll('#p-mode button').forEach(x=>x.classList.toggle('on',x===b))};
+ const upd=()=>{const a=toP($('#p-amt',ov).value);const after=bal-(isNew?(isNaN(a)?0:a):0);$('#p-after',ov).innerHTML=isNew?`<span>Pending after</span><span class="${after>0?'due':'adv'}">${after<0?rs(-after)+' advance':rs(after)}</span>`:''};$('#p-amt',ov).oninput=upd;upd();
+ if(isNew)$('#p-save',ov).onclick=async()=>{const a=toP($('#p-amt',ov).value);const d=$('#p-date',ov).value||today();if(isNaN(a)||a<=0)return toast('Enter the amount received');if(d>today())return toast('Date cannot be in the future');
+  await commit([{store:'payments',value:{id:uid(),clientId:cid,date:d,amount:a,mode,billId:null,note:$('#p-note',ov).value.trim(),voided:false,createdAt:Date.now(),sample:false,practice:isPractice()}}]);closeModal(ov);toast(`${rs(a)} received from ${c.name}`);render()};
+ const del=$('#p-del',ov);if(del)del.onclick=async()=>{if(!(await askPin('Deleting a payment changes the khata.')))return;if(!(await confirmBox(`Delete ${rs(p.amount)} received on ${fdate(p.date)}?`,'Delete',true)))return;await commit([{store:'payments',value:{...p,voided:true,voidedAt:Date.now()}}]);closeAll();toast('Payment removed');render()}}
+
+function rxForm(cid,r){const isNew=!r;r=r||{medId:'',dose:1,usual:1,tps:'',disc:'',doctor:'',startDate:today(),active:true};const c=client(cid);
+ const meds=S.meds.filter(m=>!m.archived||m.id===r.medId).sort((a,b)=>medLabel(a).localeCompare(medLabel(b)));
+ if(!meds.length)return toast('Add the medicine under Stock first');
+ const ov=modal(isNew?'Add prescription':'Prescription',`<p class="mute">${esc(c.name)}</p>
+ <label>Medicine</label><select id="r-med">${meds.map(m=>`<option value="${m.id}" ${m.id===r.medId?'selected':''}>${esc(medLabel(m))} — ${esc(m.salt||'')}</option>`).join('')}</select>
+ <div class="grid2"><div><label>Tablets per day</label><input id="r-dose" value="${r.dose}" inputmode="decimal"></div><div><label>Usual strips per visit</label><input id="r-usual" value="${r.usual}" inputmode="numeric"></div>
+ <div><label>This client’s strip size</label><input id="r-tps" value="${r.tps||''}" placeholder="shop default" inputmode="numeric"></div><div><label>This client’s discount %</label><input id="r-disc" value="${r.disc??''}" placeholder="shop default" inputmode="decimal"></div></div>
+ <div class="grid2"><div><label>Doctor (optional)</label><input id="r-doc" value="${esc(r.doctor||'')}"></div><div><label>Started on</label><input type="date" id="r-start" value="${r.startDate||today()}"></div></div>
+ <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="r-act" ${r.active!==false?'checked':''}> Still taking this medicine</label>
+ <p class="hint">Next refill date is worked out from what was actually bought ÷ tablets per day. If purchases run more than 45 days ahead, the khata flags it as stocking up.</p>
+ <div class="acts">${isNew?'':'<button class="btn red" id="r-del">Delete</button>'}<button class="btn" data-close>Cancel</button><button class="btn pri" id="r-save">Save</button></div>`);
+ $('#r-save',ov).onclick=async()=>{const dose=num($('#r-dose',ov).value);const tps=$('#r-tps',ov).value.trim();const disc=$('#r-disc',ov).value.trim();
+  if(dose<=0)return toast('Tablets per day must be more than 0');if(tps&&int(tps)<1)return toast('Strip size must be 1 or more');if(disc&&(num(disc)<0||num(disc)>cap()))return toast(`Discount must be 0 to ${cap()}%`);
+  const v={...r,id:r.id||uid(),clientId:cid,medId:$('#r-med',ov).value,dose,usual:Math.max(1,int($('#r-usual',ov).value)),tps:tps?int(tps):'',disc:disc===''?'':num(disc),doctor:$('#r-doc',ov).value.trim(),startDate:$('#r-start',ov).value||today(),active:$('#r-act',ov).checked,createdAt:r.createdAt||Date.now(),sample:!!r.sample,practice:r.id?!!r.practice:isPractice()};
+  await commit([{store:'rx',value:v}]);closeModal(ov);toast('Prescription saved');render()};
+ const del=$('#r-del',ov);if(del)del.onclick=async()=>{if(!(await confirmBox('Delete this prescription? Bills stay as they are.','Delete',true)))return;await commit([{store:'rx',del:r.id}]);closeAll();render()}}
+
+/* ---------- bill view, return, void ---------- */
+function billPosition(b){if(!b.clientId)return null;const E=ledger(b.clientId);const i=E.findIndex(e=>e.kind==='bill'&&e.ref===b.id);const before=i>0?E[i-1].bal:0;const lp=linkedPay(b.id);return{before,paid:lp?lp.amount:0,after:before+b.total-(lp?lp.amount:0),now:E.length?E[E.length-1].bal:0}}
+function billModal(id){const b=bill(id);if(!b)return;const c=client(b.clientId);const lp=linkedPay(b.id);const rets=billReturns(b.id);const pos=billPosition(b);
+ const ov=modal(`Bill #${b.no}`,`<p class="mute">${fdate(b.date)} · ${esc(c?c.name:'Walk-in')}${b.editedAt?' · edited':''}${b.voided?' · <b style="color:var(--red)">VOIDED</b>':''}</p>
+ <table class="t ${b.voided?'void':''}"><thead><tr><th>Medicine</th><th>Qty</th><th class="r">Amount</th></tr></thead><tbody>${b.items.map(it=>`<tr><td>${esc(it.name)}<div class="mute">${rs(it.mrp)}/strip of ${it.medTps}${it.disc?' · '+it.disc+'% off':''}</div></td><td>${qtyText(it)}${it.tps!==it.medTps?`<div class="mute">strip of ${it.tps}</div>`:''}</td><td class="r">${rs(it.net)}</td></tr>`).join('')}</tbody></table>
+ <div class="tot"><span>MRP total</span><span>${rs(b.gross)}</span></div><div class="tot"><span>Discount</span><span>−${rs(b.disc)}</span></div>${b.roundOff?`<div class="tot"><span>Round off</span><span>${rs(b.roundOff)}</span></div>`:''}
+ <div class="tot big"><span>Bill total</span><span>${rs(b.total)}</span></div>
+ <div class="tot"><span>Received with bill</span><span class="money-in">${lp?rs(lp.amount)+' · '+(lp.mode==='upi'?'UPI':'Cash'):'—'}</span></div>
+ ${rets.length?`<div class="tot"><span>Returned</span><span class="money-in">−${rs(rets.reduce((s,r)=>s+r.total,0))}</span></div><div class="mute">${rets.map(r=>fdate(r.date)+': '+r.items.map(i=>esc(i.name)+' '+i.tablets+' tab').join(', ')).join('<br>')}</div>`:''}
+ ${pos?`<div class="tot"><span>Khata after this bill</span><span>${rs(pos.after)}</span></div>`:''}
+ <div class="acts"><button class="btn wa" data-act="shareBill" data-id="${b.id}">Share</button>${b.voided?'':`<button class="btn" data-act="editBill" data-id="${b.id}">Edit</button><button class="btn" data-act="returnBill" data-id="${b.id}">Return packs</button><button class="btn red" data-act="voidBill" data-id="${b.id}">Void</button>`}</div>
+ ${b.voided?'':'<p class="hint">Edit, return and void need the pharmacist PIN.</p>'}`)}
+async function editBill(id){const b=bill(id);if(billReturns(id).length)return toast('This bill has a return on it. Make another return or void the bill instead.',4000);
+ if(!(await askPin(`Edit bill #${b.no}`)))return;const lp=linkedPay(id);
+ C.cid=b.clientId||'walkin';C.cart=b.items.map(it=>({medId:it.medId,name:it.name,salt:it.salt,mrp:it.mrp,medTps:it.medTps,tps:it.tps,strips:it.strips,loose:it.loose,disc:it.disc}));C.paid=lp?String(lp.amount/100):'';C.mode=lp?lp.mode:'cash';C.date=b.date;C.edit=b.id;closeAll();go('counter')}
+async function returnBill(id){const b=bill(id);if(!(await askPin(`Return packs on bill #${b.no}`)))return;
+ const rows=b.items.map((it,i)=>{const left=it.tablets-returnedTabs(b.id,it.medId);return{it,i,left}});
+ if(!rows.some(r=>r.left>0))return toast('Everything on this bill is already returned');
+ const ov=modal(`Return on bill #${b.no}`,`${rows.map(r=>`<div class="line"><b>${esc(r.it.name)}</b><div class="mute">Sold ${r.it.tablets} tablets · can return ${r.left}</div>${r.left>0?`<div class="grid2"><div><label>Strips back</label><input data-rs="${r.i}" inputmode="numeric" placeholder="0"></div><div><label>Loose tablets back</label><input data-rl="${r.i}" inputmode="numeric" placeholder="0"></div></div>`:''}</div>`).join('')}
+ <label>Return date</label><input type="date" id="rt-date" value="${today()}" min="${b.date}" max="${today()}">
+ <div class="tot big"><span>${b.clientId?'Comes off the khata':'Give back in cash'}</span><span id="rt-amt">₹0</span></div>
+ <div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="rt-save">Save return</button></div><p class="hint">Stock goes back on the shelf. Refund is at the price actually charged (after discount).</p>`);
+ const calc=()=>{let total=0,err='';const items=[];for(const r of rows){if(r.left<=0)continue;const s=int(($(`[data-rs="${r.i}"]`,ov)||{}).value),l=int(($(`[data-rl="${r.i}"]`,ov)||{}).value);const tabs=s*r.it.tps+l;if(!tabs)continue;if(tabs>r.left)err=`${r.it.name}: only ${r.left} tablets can come back`;const amt=Math.round(r.it.net*tabs/r.it.tablets);total+=amt;items.push({medId:r.it.medId,name:r.it.name,tablets:tabs,amount:amt})}return{total,items,err}};
+ ov.addEventListener('input',()=>{$('#rt-amt',ov).textContent=rs(calc().total)});
+ $('#rt-save',ov).onclick=async()=>{const{total,items,err}=calc();if(err)return toast(err);if(!items.length)return toast('Enter what is coming back');const d=$('#rt-date',ov).value||today();if(d<b.date)return toast('Return cannot be before the bill date');
+  const ops=[{store:'returns',value:{id:uid(),billId:b.id,clientId:b.clientId,date:d,items,total,voided:false,createdAt:Date.now(),sample:false,practice:isPractice()}}];
+  for(const i of items){const m=med(i.medId);if(m)ops.push({store:'meds',value:{...m,stockTab:m.stockTab+i.tablets}})}
+  await commit(ops);closeAll();toast(`Return saved · ${rs(total)}${b.clientId?' off the khata':' to give back'}`);render()}}
+async function voidBill(id){const b=bill(id);if(!(await askPin(`Void bill #${b.no}`)))return;const lp=linkedPay(id);
+ if(!(await confirmBox(`Void bill #${b.no} (${rs(b.total)})? Its medicines go back on the shelf${lp?`, and the ${rs(lp.amount)} received with it is removed (hand it back)`:''}. It stays in the list, crossed out.`,'Void bill',true)))return;
+ const ops=[{store:'bills',value:{...b,voided:true,voidedAt:Date.now()}}];
+ for(const it of b.items){const back=it.tablets-returnedTabs(b.id,it.medId);const m=med(it.medId);if(m&&back>0)ops.push({store:'meds',value:{...m,stockTab:m.stockTab+back}})}
+ // merge stock ops for duplicate meds
+ const merged={};for(const o of ops.filter(o=>o.store==='meds'))merged[o.value.id]=(merged[o.value.id]||0)+(o.value.stockTab-med(o.value.id).stockTab);
+ const final=ops.filter(o=>o.store!=='meds');for(const[mid,dv]of Object.entries(merged)){const m=med(mid);final.push({store:'meds',value:{...m,stockTab:m.stockTab+dv}})}
+ for(const r of billReturns(id))final.push({store:'returns',value:{...r,voided:true}});
+ if(lp)final.push({store:'payments',value:{...lp,voided:true,voidedAt:Date.now()}});
+ await commit(final);closeAll();toast(`Bill #${b.no} voided`);render()}
+
+/* ---------- month bill ---------- */
+function monthBill(cid,m){const c=client(cid);m=m||(new Date().getDate()<=10?shiftYM(thisYM(),-1):thisYM());const s=statement(cid,m);
+ const ov=modal('Month bill',`<p><b>${esc(c.name)}</b></p><label>Month</label><input type="month" id="mb-m" value="${m}" max="${thisYM()}">
+ <div class="card" style="margin-top:12px"><div class="tot"><span>Brought forward (till ${fdate(addDays(s.start,-1))})</span><span>${rs(s.bf)}</span></div>
+ ${s.open?`<div class="tot"><span>Opening balance entered</span><span>${rs(s.open)}</span></div>`:''}
+ <div class="tot"><span>+ Medicines this month</span><span>${rs(s.meds)}</span></div>${s.rets?`<div class="tot"><span>− Returns</span><span>${rs(s.rets)}</span></div>`:''}
+ <div class="tot"><span>− Money received</span><span class="money-in">${rs(s.paid)}</span></div>
+ <div class="tot big"><span>Closing due</span><span class="${s.closing>0?'due':'adv'}">${s.closing<0?rs(-s.closing)+' advance':rs(s.closing)}</span></div>
+ <p class="hint">This closing is ${mName(shiftYM(m,1))}’s opening automatically. Nothing is typed twice.</p></div>
+ <table class="t"><tbody>${s.rows.map(e=>`<tr><td class="nw">${sdate(e.date)}</td><td>${esc(e.text)}</td><td class="r ${e.amt<0?'money-in':''}">${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}</td></tr>`).join('')||'<tr><td class="empty">No entries this month.</td></tr>'}</tbody></table>
+ <div class="acts"><button class="btn wa" id="mb-share">Share statement</button></div>`);
+ $('#mb-m',ov).onchange=e=>{if(!e.target.value)return;closeModal(ov);monthBill(cid,e.target.value)};
+ $('#mb-share',ov).onclick=()=>shareStatement(cid,m)}
+
+/* =================== STOCK =================== */
+function vStock(){return`<div class="row" style="margin-bottom:8px"><input id="sq" class="grow" placeholder="Search name or salt" autocomplete="off" aria-label="Search stock"><button class="btn pri" data-act="medNew">+ Add medicine</button></div><div class="card list" id="st-res"></div>`}
+function fillStock(q=''){const el=$('#st-res');if(!el)return;q=q.trim().toLowerCase();
+ const list=S.meds.filter(m=>!m.archived&&(!q||medLabel(m).toLowerCase().includes(q)||(m.salt||'').toLowerCase().includes(q))).sort((a,b)=>medLabel(a).localeCompare(medLabel(b)));
+ el.innerHTML=list.map(m=>medRow(m,'medEdit')).join('')||'<div class="empty">No medicines yet.</div>'}
+function medForm(m){const isNew=!m;m=m||{name:'',strength:'',salt:'',tps:10,mrp:0,disc:0,stockTab:0,minStrips:S.settings.lowStrips,expiry:''};
+ const used=!isNew&&(S.bills.some(b=>b.items.some(i=>i.medId===m.id))||S.rx.some(r=>r.medId===m.id));
+ const ov=modal(isNew?'Add medicine':'Edit medicine',`<div class="grid2"><div><label>Name *</label><input id="m-name" value="${esc(m.name)}"></div><div><label>Strength</label><input id="m-str" value="${esc(m.strength||'')}" placeholder="500 mg"></div></div>
+ <label>Salt</label><input id="m-salt" value="${esc(m.salt||'')}" placeholder="Metformin">
+ <div class="grid2"><div><label>Tablets in one strip *</label><input id="m-tps" value="${m.tps}" inputmode="numeric"></div><div><label>MRP per strip (₹) *</label><input id="m-mrp" value="${m.mrp?m.mrp/100:''}" inputmode="decimal"></div>
+ <div><label>Usual discount % (max ${cap()})</label><input id="m-disc" value="${m.disc||0}" inputmode="decimal"></div><div><label>Expiry (nearest)</label><input type="month" id="m-exp" value="${m.expiry||''}"></div>
+ <div><label>On shelf: strips</label><input id="m-ss" value="${Math.floor(Math.max(0,m.stockTab)/m.tps)}" inputmode="numeric"></div><div><label>+ loose tablets</label><input id="m-sl" value="${Math.max(0,m.stockTab)%m.tps||''}" placeholder="0" inputmode="numeric"></div>
+ <div><label>New stock received (strips)</label><input id="m-add" placeholder="0" inputmode="numeric"></div><div><label>Low alert below (strips)</label><input id="m-min" value="${m.minStrips??S.settings.lowStrips}" inputmode="numeric"></div></div>
+ ${m.stockTab<0?`<p class="hint" style="color:var(--red)">Shelf count is below zero (${m.stockTab} tablets). Enter the real count above.</p>`:''}
+ <div class="acts">${isNew?'':`<button class="btn red" id="m-del">${used?'Hide from list':'Delete'}</button>`}<button class="btn" data-close>Cancel</button><button class="btn pri" id="m-save">Save</button></div>`);
+ $('#m-save',ov).onclick=()=>{const name=$('#m-name',ov).value.trim();const tps=int($('#m-tps',ov).value);const mrp=toP($('#m-mrp',ov).value);const disc=num($('#m-disc',ov).value);
+  if(!name)return toast('Name is needed');if(tps<1)return toast('Tablets in one strip must be 1 or more');if(isNaN(mrp)||mrp<=0)return toast('Enter the MRP per strip');if(disc<0||disc>cap())return toast(`Discount must be 0 to ${cap()}%`);
+  const lab=(name+' '+$('#m-str',ov).value.trim()).toLowerCase().trim();const dup=S.meds.find(x=>!x.archived&&x.id!==m.id&&medLabel(x).toLowerCase()===lab);if(dup)return toast('A medicine with this name and strength already exists');
+  const shelf=int($('#m-ss',ov).value)*tps+int($('#m-sl',ov).value)+int($('#m-add',ov).value)*tps;
+  const v={...m,id:m.id||uid(),name,strength:$('#m-str',ov).value.trim(),salt:$('#m-salt',ov).value.trim(),tps,mrp,disc,expiry:$('#m-exp',ov).value,stockTab:shelf,minStrips:int($('#m-min',ov).value),archived:false,createdAt:m.createdAt||Date.now(),sample:!!m.sample,practice:m.id?!!m.practice:isPractice()};
+  commit([{store:'meds',value:v}]).then(()=>{closeModal(ov);toast('Medicine saved');render()})};
+ const del=$('#m-del',ov);if(del)del.onclick=async()=>{if(!(await confirmBox(used?'Hide this medicine? Old bills keep showing it.':'Delete this medicine?',used?'Hide':'Delete',true)))return;await commit([used?{store:'meds',value:{...m,archived:true}}:{store:'meds',del:m.id}]);closeAll();render()}}
+
+/* =================== REPORTS =================== */
+function monthNums(m){const st=m+'-01',en=monthEnd(m);const bills=S.bills.filter(b=>!b.voided&&b.date>=st&&b.date<=en);const billed=bills.reduce((s,b)=>s+b.total,0);
+ const rets=S.returns.filter(r=>!r.voided&&r.date>=st&&r.date<=en).reduce((s,r)=>s+r.total,0);const got=S.payments.filter(p=>!p.voided&&p.date>=st&&p.date<=en).reduce((s,p)=>s+p.amount,0);return{bills,billed,rets,got}}
+function vReports(){const m=R.m||thisYM();const n=monthNums(m);const asOf=monthEnd(m)<today()?monthEnd(m):today();const bal=balances(asOf);let due=0,adv=0;for(const c of S.clients){const v=bal[c.id]||0;if(v>0)due+=v;else adv-=v}
+ const top={};for(const b of n.bills)for(const it of b.items){const k=it.medId;top[k]=top[k]||{name:it.name,amt:0,tabs:0};top[k].amt+=it.net;top[k].tabs+=it.tablets}
+ const topL=Object.values(top).sort((a,b)=>b.amt-a.amt).slice(0,5);
+ const six=[];for(let i=5;i>=0;i--){const mm=shiftYM(m,-i);const x=monthNums(mm);six.push({m:mm,b:x.billed-x.rets,g:x.got})}const mx=Math.max(1,...six.map(x=>Math.max(x.b,x.g)));
+ const low=S.meds.filter(x=>!x.archived&&x.stockTab<num(x.minStrips??S.settings.lowStrips)*x.tps);
+ const exp=S.meds.filter(x=>!x.archived&&x.expiry&&x.expiry<=ymOf(addDays(today(),60)));
+ const nowBal=balances();const topDue=S.clients.filter(c=>(nowBal[c.id]||0)>0).sort((a,b)=>nowBal[b.id]-nowBal[a.id]).slice(0,5);
+ return`<div class="row" style="margin-bottom:10px"><button class="btn sm" data-act="rm" data-v="-1" aria-label="Previous month">‹</button><input type="month" id="rmonth" class="grow" value="${m}" max="${thisYM()}"><button class="btn sm" data-act="rm" data-v="1" aria-label="Next month" ${m>=thisYM()?'disabled':''}>›</button></div>
+ <div class="kpis"><div class="kpi"><span class="mute">Billed${n.rets?' (after returns)':''}</span><b>${rs(n.billed-n.rets)}</b></div><div class="kpi"><span class="mute">Collected</span><b class="money-in">${rs(n.got)}</b></div>
+ <div class="kpi"><span class="mute">Still due on ${fdate(asOf)}</span><b class="due">${rs(due)}</b>${adv?`<span class="mute">advances ${rs(adv)}</span>`:''}</div><div class="kpi"><span class="mute">${n.bills.length} bills · average</span><b>${rs(n.bills.length?n.billed/n.bills.length:0)}</b></div></div>
+ <div class="card"><h2>Six months</h2><div class="bars">${six.map(x=>`<div class="b"><div class="pair"><i style="height:${x.b/mx*100}%" title="Billed ${rs(x.b)}"></i><i class="c" style="height:${x.g/mx*100}%" title="Collected ${rs(x.g)}"></i></div>${MON[+x.m.slice(5)-1]}</div>`).join('')}</div><div class="legend"><span style="background:var(--pri)"></span>Billed<span style="background:#8cc9ad"></span>Collected</div></div>
+ <div class="card"><h2>Top medicines · ${mName(m)}</h2>${topL.length?`<table class="t"><tbody>${topL.map(x=>`<tr><td>${esc(x.name)}</td><td class="r mute">${x.tabs} tab</td><td class="r">${rs(x.amt)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No sales this month.</div>'}</div>
+ <div class="card"><h2>Highest pending today</h2><div class="list">${topDue.map(c=>`<div class="it" data-act="openKhata" data-id="${c.id}"><div>${esc(c.name)}</div><div class="due">${rs(nowBal[c.id])}</div></div>`).join('')||'<div class="empty">Nobody owes anything.</div>'}</div></div>
+ <div class="card"><h2>Low stock</h2><div class="list">${low.map(x=>medRow(x,'medEdit')).join('')||'<div class="empty">All good.</div>'}</div></div>
+ ${exp.length?`<div class="card"><h2>Expiring within 60 days</h2><div class="list">${exp.map(x=>medRow(x,'medEdit')).join('')}</div></div>`:''}
+ <div class="card"><h2>Excel</h2><div class="acts"><button class="btn" data-act="csvMonth">Month statements (all clients)</button><button class="btn" data-act="csvBills" data-m="${m}">This month’s bills</button></div></div>`}
+
+/* =================== SHOP =================== */
+function vShop(){const s=S.settings;const counts=['clients','bills','payments','meds'].map(k=>`${S[k].length} ${k==='meds'?'medicines':k}`).join(' · ');
+ return`<div class="card"><h2>Shop details</h2>
+ <label>Shop name *</label><input id="s-name" value="${esc(s.name)}" placeholder="e.g. Anand Medical Hall">
+ <div class="grid2"><div><label>Pharmacist name</label><input id="s-ph" value="${esc(s.pharmacist)}"></div><div><label>Shop phone</label><input id="s-phone" value="${esc(s.phone)}" inputmode="tel"></div></div>
+ <label>Counter person’s name</label><input id="s-counter" value="${esc(s.counter)}">
+ <label>Address</label><input id="s-addr" value="${esc(s.address)}">
+ <label>Letterhead line (drug licence no., GSTIN)</label><input id="s-lh" value="${esc(s.letterhead)}">
+ <label>Logo</label><div class="row"><img id="s-logo-prev" src="${s.logo||''}" alt="" style="width:48px;height:48px;object-fit:contain;border:1px solid var(--line);border-radius:8px;${s.logo?'':'display:none'}"><input type="file" id="s-logo" accept="image/*" class="grow" data-nofocus="1">${s.logo?'<button class="btn sm" data-act="rmLogo">Remove</button>':''}</div>
+ <label>Low-stock alert below (strips, default)</label><input id="s-low" value="${s.lowStrips??2}" inputmode="numeric">
+ <div class="acts"><button class="btn pri" data-act="saveShop">Save shop details</button></div></div>
+ <div class="card"><h2>Locked by PIN</h2><div class="tot"><span>Discount cap</span><b>${cap()}%</b></div><div class="acts"><button class="btn" data-act="changeCap">Change cap</button><button class="btn" data-act="changePin">Change PIN</button></div>${s.name?'':'<p class="hint">Sample PIN is 2580. Change it before real use.</p>'}</div>
+ <div class="card"><h2>Backup</h2><p class="mute">Last backup: <b>${s.lastBackup?fdate(dstr(new Date(s.lastBackup))):'never'}</b>. Send the file to yourself on WhatsApp or Drive once a week.</p>
+ <div class="acts"><button class="btn pri" data-act="backupJson">Download full backup</button><button class="btn" data-act="restoreJson">Restore a backup</button></div></div>
+ <div class="card"><h2>Excel (CSV)</h2><p class="mute">Opens in Excel or Google Sheets.</p><div class="acts"><button class="btn sm" data-act="csvLedger">Khata entries</button><button class="btn sm" data-act="csvBills">All bills with items</button><button class="btn sm" data-act="csvClients">Clients + balance</button><button class="btn sm" data-act="csvStock">Stock</button></div>
+ <h2 style="margin-top:14px">Import from Excel</h2><p class="mute">Type the paper book into a sheet once, save as CSV, import here. Download a template to see the columns.</p>
+ <div class="acts"><button class="btn sm" data-act="impClients">Import clients</button><button class="btn sm" data-act="tplClients">Clients template</button><button class="btn sm" data-act="impStock">Import stock</button><button class="btn sm" data-act="tplStock">Stock template</button></div></div>
+ ${hasSample()?`<div class="card"><h2>Practice data</h2><p class="mute">Removes the sample shop (Suresh, Harpreet, sample stock). You choose whether to also remove what you typed while practising.</p><div class="acts"><button class="btn red" data-act="clearSample">Clear practice data</button></div></div>`:''}
+ <div class="card mute">On this phone: ${counts}. Storage ${persisted?'is protected from automatic clean-up':'may be cleared by the browser if the phone runs low on space. Keep backups'}. Nothing is sent to any server.</div>`}
+
+async function saveShop(){const s={...S.settings};const name=$('#s-name').value.trim();if(!name)return toast('Shop name is needed');
+ const wasPractice=!S.settings.name;
+ Object.assign(s,{name,pharmacist:$('#s-ph').value.trim(),phone:$('#s-phone').value.trim(),counter:$('#s-counter').value.trim(),address:$('#s-addr').value.trim(),letterhead:$('#s-lh').value.trim(),lowStrips:int($('#s-low').value)});
+ if(pendingLogo!==null){s.logo=pendingLogo;pendingLogo=null}
+ await commit([{store:'settings',value:s}]);toast('Shop details saved');render();
+ if(wasPractice&&hasSample())clearPracticeDialog(true)}
+function practiceTyped(){let n=0;for(const st of STORES)if(st!=='settings')n+=S[st].filter(x=>x.practice&&!x.sample).length;return n}
+async function clearPracticeDialog(afterSave){if(!afterSave&&!(await askPin('Clear practice data')))return;const typed=practiceTyped();
+ const ov=modal('Clear practice books',`<p>${afterSave?`<b>${esc(S.settings.name)}</b> is saved. `:''}Remove the sample shop: Suresh, Harpreet and the others, their bills, and the sample stock?</p>
+ ${typed?`<label style="display:flex;gap:10px;align-items:flex-start;color:var(--ink);font-size:15px"><input type="checkbox" id="cp-typed" checked style="margin-top:4px"> Also remove the ${typed} entr${typed===1?'y':'ies'} typed while practising</label><p class="hint">Untick this if you already typed real clients or stock before saving the shop name.</p>`:''}
+ <div class="acts"><button class="btn" data-close>Not now</button><button class="btn red" id="cp-ok">Clear practice books</button></div>`);
+ $('#cp-ok',ov).onclick=async()=>{const all=typed?$('#cp-typed',ov).checked:true;closeModal(ov);await clearSample(all)}}
+async function clearSample(alsoTyped){const gone=x=>x.sample||(alsoTyped&&x.practice);
+ const keepMed=new Set(),keepCli=new Set();
+ for(const b of S.bills)if(!gone(b)){b.items.forEach(i=>keepMed.add(i.medId));if(b.clientId)keepCli.add(b.clientId)}
+ for(const r of S.rx)if(!gone(r)){keepMed.add(r.medId);keepCli.add(r.clientId)}
+ for(const st of ['payments','returns'])for(const x of S[st])if(!gone(x)&&x.clientId)keepCli.add(x.clientId);
+ const ops=[];for(const st of STORES){if(st==='settings')continue;for(const x of S[st]){
+  if(gone(x)&&!((st==='meds'&&keepMed.has(x.id))||(st==='clients'&&keepCli.has(x.id))))ops.push({store:st,del:x.id});
+  else if(x.sample||x.practice)ops.push({store:st,value:{...x,sample:false,practice:false}})}}
+ if(!ops.length)return toast('No practice data left');
+ const left=S.bills.filter(b=>!gone(b));ops.push({store:'settings',value:{...S.settings,billSeq:left.reduce((m,b)=>Math.max(m,b.no),0)}});
+ await commit(ops);resetCounter();toast('Practice books cleared. Your khata is clean.');render()}
+
+/* ---------- logo ---------- */
+function readLogo(file){const fr=new FileReader();fr.onload=()=>{const img=new Image();img.onload=()=>{const k=Math.min(1,200/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);pendingLogo=c.toDataURL('image/png');const p=$('#s-logo-prev');if(p){p.src=pendingLogo;p.style.display=''}toast('Logo ready. Tap Save shop details.')};img.onerror=()=>toast('Could not read that image');img.src=fr.result};fr.readAsDataURL(file)}
+
+/* =================== BACKUP / CSV =================== */
+function download(name,content,type){const b=content instanceof Blob?content:new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+const fileTag=()=>(S.settings.name||'practice').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+today();
+async function backupJson(){const data={};for(const s of STORES)data[s]=s==='settings'?[S.settings]:S[s];const st={...S.settings,lastBackup:Date.now()};data.settings=[st];
+ download(`counter-khata-${fileTag()}.json`,JSON.stringify({app:'counter-khata',version:1,exportedAt:new Date().toISOString(),data}),'application/json');
+ await commit([{store:'settings',value:st}]);toast('Backup downloaded. Keep it somewhere safe.');render()}
+async function restoreJson(file){let j;try{j=JSON.parse(await file.text())}catch{return toast('That file is not a Counter Khata backup')}
+ if(!j||j.app!=='counter-khata'||!j.data||!Array.isArray(j.data.settings))return toast('That file is not a Counter Khata backup');
+ const d=j.data;const n=(d.bills||[]).length;
+ if(!(await askPin('Restore replaces everything on this phone.')))return;
+ if(!(await confirmBox(`Replace all books on this phone with the backup from <b>${esc((j.exportedAt||'').slice(0,10))}</b> (${(d.clients||[]).length} clients, ${n} bills)? This cannot be undone.`,'Replace everything',true)))return;
+ const ops=[];for(const s of STORES){ops.push({store:s,clear:true});for(const v of(d[s]||[]))if(v&&v.id)ops.push({store:s,value:v})}
+ try{await commit(ops)}catch(e){return toast('Restore failed: '+e.message)}resetCounter();toast('Backup restored');go('counter')}
+function csv(rows){return'﻿'+rows.map(r=>r.map(v=>{v=v==null?'':String(v);return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(',')).join('\r\n')}
+function parseCSV(text){text=text.replace(/^﻿/,'');const rows=[];let row=[],f='',q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(f);f=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=ch}if(f!==''||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>String(x).trim()!==''))}
+function csvObjects(text){const rows=parseCSV(text);if(rows.length<2)return[];const h=rows[0].map(x=>x.trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''));return rows.slice(1).map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??'').trim()])))}
+const CSV_CLIENT_H=['name','phone','address','opening_balance','opening_date'];
+const CSV_STOCK_H=['name','strength','salt','tablets_per_strip','mrp_per_strip','discount','stock_strips','stock_loose','min_strips','expiry'];
+const ACTS_CSV={
+ csvLedger(){const rows=[['client','phone','date','entry','debit','credit','balance']];for(const c of [...S.clients].sort((a,b)=>a.name.localeCompare(b.name)))for(const e of ledger(c.id))rows.push([c.name,c.phone,e.date,e.text,e.amt>0?rupees(e.amt):'',e.amt<0?rupees(-e.amt):'',rupees(e.bal)]);download(`khata-${fileTag()}.csv`,csv(rows),'text/csv')},
+ csvBills(el){const m=el&&el.dataset.m;const rows=[['bill_no','date','client','phone','medicine','salt','strips','loose','tablets','strip_size','mrp_per_strip','discount_pct','amount','bill_total','received_with_bill','status']];
+  for(const b of [...S.bills].sort((a,b)=>a.no-b.no)){if(m&&ymOf(b.date)!==m)continue;const c=client(b.clientId);const lp=linkedPay(b.id);b.items.forEach((it,i)=>rows.push([b.no,b.date,c?c.name:'Walk-in',c?c.phone:'',it.name,it.salt,it.strips,it.loose,it.tablets,it.tps,rupees(it.mrp),it.disc,rupees(it.net),i?'':rupees(b.total),i?'':(lp?rupees(lp.amount):''),b.voided?'void':'']))}
+  download(`bills-${m||'all'}-${fileTag()}.csv`,csv(rows),'text/csv')},
+ csvClients(){const bal=balances();const rows=[[...CSV_CLIENT_H,'balance_today']];for(const c of S.clients)rows.push([c.name,c.phone,c.address,rupees(c.openingBal),c.openingDate,rupees(bal[c.id]||0)]);download(`clients-${fileTag()}.csv`,csv(rows),'text/csv')},
+ csvStock(){const rows=[CSV_STOCK_H];for(const m of S.meds)if(!m.archived)rows.push([m.name,m.strength,m.salt,m.tps,rupees(m.mrp),m.disc,Math.floor(Math.max(0,m.stockTab)/m.tps),Math.max(0,m.stockTab)%m.tps,m.minStrips??'',m.expiry]);download(`stock-${fileTag()}.csv`,csv(rows),'text/csv')},
+ csvMonth(){const m=R.m||thisYM();const rows=[['client','phone','month','brought_forward','medicines','returns','received','closing_due']];for(const c of [...S.clients].sort((a,b)=>a.name.localeCompare(b.name))){const s=statement(c.id,m);rows.push([c.name,c.phone,m,rupees(s.bf+s.open),rupees(s.meds),rupees(s.rets),rupees(s.paid),rupees(s.closing)])}download(`month-statements-${m}.csv`,csv(rows),'text/csv')},
+ tplClients(){download('clients-template.csv',csv([CSV_CLIENT_H,['Ramesh Gupta','9812345678','Main Bazaar','1450',today()]]),'text/csv')},
+ tplStock(){download('stock-template.csv',csv([CSV_STOCK_H,['Metformin SR','500 mg','Metformin','15','38','10','20','0','4',shiftYM(thisYM(),12)]]),'text/csv')}};
+async function importClients(file){const rows=csvObjects(await file.text());if(!rows.length)return toast('No rows found. First row must be the column names.');
+ let add=0,skip=[];const ops=[];const seen=new Set(S.clients.map(c=>c.phone).filter(Boolean));
+ rows.forEach((r,i)=>{const name=r.name;const phone=normPhone(r.phone);const ob=r.opening_balance?toP(r.opening_balance):0;const od=/^\d{4}-\d{2}-\d{2}$/.test(r.opening_date||'')?r.opening_date:today();
+  if(!name){skip.push(`row ${i+2}: no name`);return}if(phone&&phone.length!==10){skip.push(`row ${i+2}: phone`);return}if(phone&&seen.has(phone)){skip.push(`row ${i+2}: ${name} already exists`);return}if(isNaN(ob)){skip.push(`row ${i+2}: balance`);return}
+  if(phone)seen.add(phone);ops.push({store:'clients',value:{id:uid(),name,phone,address:r.address||'',openingBal:ob,openingDate:od>today()?today():od,createdAt:Date.now()+i,sample:false,practice:isPractice()}});add++});
+ if(ops.length)await commit(ops);render();showImportResult('Clients',add,0,skip)}
+async function importStock(file){const rows=csvObjects(await file.text());if(!rows.length)return toast('No rows found. First row must be the column names.');
+ let add=0,upd=0,skip=[];const ops=[];const byLabel=new Map(S.meds.filter(m=>!m.archived).map(m=>[medLabel(m).toLowerCase(),m]));
+ rows.forEach((r,i)=>{const name=r.name,tps=int(r.tablets_per_strip),mrp=toP(r.mrp_per_strip),disc=Math.min(num(r.discount),cap());
+  if(!name||tps<1||isNaN(mrp)||mrp<=0){skip.push(`row ${i+2}: needs name, tablets_per_strip, mrp_per_strip`);return}
+  const lab=(name+' '+(r.strength||'')).trim().toLowerCase();const ex=byLabel.get(lab);const shelf=int(r.stock_strips)*tps+int(r.stock_loose);
+  const v={...(ex||{}),id:ex?ex.id:uid(),name,strength:r.strength||'',salt:r.salt||'',tps,mrp,disc,stockTab:shelf,minStrips:r.min_strips!==''&&r.min_strips!=null?int(r.min_strips):S.settings.lowStrips,expiry:/^\d{4}-\d{2}$/.test(r.expiry||'')?r.expiry:'',archived:false,createdAt:ex?ex.createdAt:Date.now()+i,sample:false,practice:isPractice()};
+  byLabel.set(lab,v);ops.push({store:'meds',value:v});ex?upd++:add++});
+ if(ops.length)await commit(ops);render();showImportResult('Stock',add,upd,skip)}
+function showImportResult(what,add,upd,skip){modal(`${what} import`,`<p><b>${add}</b> added${upd?`, <b>${upd}</b> updated`:''}${skip.length?`, <b>${skip.length}</b> skipped`:''}.</p>${skip.length?`<div class="mute">${skip.slice(0,30).map(esc).join('<br>')}</div>`:''}<div class="acts"><button class="btn pri" data-close>OK</button></div>`)}
+
+/* =================== SHARE: bill image for WhatsApp =================== */
+function loadImg(src){return new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src})}
+async function drawDoc(blocks){const W=760,X=36,XR=724;const H={head:0,kv:32,hr:18,th:30,item:50,itemS:32,tot:30,big:42,text:28,small:24,gap:12};
+ const s=S.settings;const logo=await loadImg(s.logo);const headLines=[s.address,s.letterhead,[s.phone&&'Ph '+s.phone,s.pharmacist&&'Pharmacist: '+s.pharmacist].filter(Boolean).join(' · ')].filter(Boolean);
+ H.head=Math.max(logo?96:0,52+headLines.length*24)+10;
+ let h=24;for(const b of blocks)h+=b.t==='item'?(b.sub?H.item:H.itemS):H[b.t];h+=24;
+ const c=document.createElement('canvas');const k=2;c.width=W*k;c.height=h*k;const g=c.getContext('2d');g.scale(k,k);g.fillStyle='#fff';g.fillRect(0,0,W,h);g.textBaseline='alphabetic';
+ const F=(sz,w='400')=>`${w} ${sz}px system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif`;
+ const fit=(t,max)=>{t=String(t??'');if(g.measureText(t).width<=max)return t;while(t.length>1&&g.measureText(t+'…').width>max)t=t.slice(0,-1);return t+'…'};
+ const txt=(t,x,y,{sz=19,w='400',col='#1d2421',al='left',max=9999}={})=>{g.font=F(sz,w);g.fillStyle=col;g.textAlign=al;g.fillText(fit(t,max),x,y)};
+ const COLS=[[X,'left',300],[350,'left',150],[585,'right',120],[645,'right',55],[XR,'right',120]];
+ let y=24;for(const b of blocks){
+  if(b.t==='head'){let tx=X;if(logo){const sc=Math.min(80/logo.width,80/logo.height);g.drawImage(logo,X,y,logo.width*sc,logo.height*sc);tx=X+96}txt(shopName()+(s.name?'':' (practice)'),tx,y+32,{sz:28,w:'700',max:XR-tx});headLines.forEach((l,i)=>txt(l,tx,y+60+i*24,{sz:16,col:'#6b736f',max:XR-tx}));y+=H.head}
+  else if(b.t==='kv'){txt(b.l,X,y+22,{sz:19,w:b.bold?'700':'400',max:420});txt(b.r,XR,y+22,{sz:19,al:'right',col:'#6b736f',max:280});y+=H.kv}
+  else if(b.t==='hr'){g.strokeStyle='#d9d6ce';g.lineWidth=1;g.beginPath();g.moveTo(X,y+9);g.lineTo(XR,y+9);g.stroke();y+=H.hr}
+  else if(b.t==='th'){b.cells.forEach((v,i)=>{const[cx,al,mx]=(b.cols||COLS)[i];txt(v,cx,y+20,{sz:15,w:'600',col:'#6b736f',al,max:mx})});y+=H.th}
+  else if(b.t==='item'){b.cells.forEach((v,i)=>{const[cx,al,mx]=(b.cols||COLS)[i];txt(v,cx,y+22,{sz:18,w:i===0?'600':'400',al,max:mx,col:b.mute?'#6b736f':'#1d2421'})});if(b.sub)txt(b.sub,X,y+42,{sz:14,col:'#6b736f',max:300});y+=b.sub?H.item:H.itemS}
+  else if(b.t==='tot'||b.t==='big'){const big=b.t==='big';txt(b.l,big||b.wide?X:330,y+(big?30:21),{sz:big?24:18,w:big?'700':'400',col:big?'#1d2421':'#3f4743',max:big||b.wide?520:260});txt(b.r,XR,y+(big?30:21),{sz:big?24:18,w:big?'700':'600',al:'right',col:b.col||'#1d2421'});y+=H[b.t]}
+  else if(b.t==='text'){txt(b.s,b.c?W/2:X,y+20,{sz:18,w:b.bold?'700':'400',al:b.c?'center':'left',max:XR-X});y+=H.text}
+  else if(b.t==='small'){txt(b.s,b.c?W/2:X,y+17,{sz:14,col:'#6b736f',al:b.c?'center':'left',max:XR-X});y+=H.small}
+  else if(b.t==='gap')y+=H.gap}
+ return c}
+async function shareBill(id){const b=bill(id);const c=client(b.clientId);const pos=billPosition(b);const lp=linkedPay(b.id);const rets=billReturns(b.id);
+ const blocks=[{t:'head'},{t:'hr'},{t:'kv',l:`Bill #${b.no}${b.voided?'  (VOIDED)':''}`,r:fdate(b.date),bold:true},{t:'kv',l:c?c.name:'Walk-in customer',r:c?c.phone||'':''},{t:'hr'},{t:'th',cells:['Medicine','Qty','MRP/strip','Disc','Amount']},
+  ...b.items.map(it=>({t:'item',cells:[it.name,qtyText(it),rs(it.mrp),it.disc?it.disc+'%':'—',rs(it.net)],sub:[it.salt,it.tps!==it.medTps?'strip of '+it.tps:''].filter(Boolean).join(' · ')})),
+  {t:'hr'},{t:'tot',l:'MRP total',r:rs(b.gross)},{t:'tot',l:'Discount',r:'−'+rs(b.disc)},...(b.roundOff?[{t:'tot',l:'Round off',r:rs(b.roundOff)}]:[]),{t:'big',l:'Bill total',r:rs(b.total)},
+  ...(pos?[{t:'tot',l:'+ Previous balance',r:rs(pos.before)}]:[]),
+  ...(lp?[{t:'tot',l:'− Received ('+(lp.mode==='upi'?'UPI':'cash')+')',r:rs(lp.amount),col:'#0f6b4a'}]:[]),
+  ...(rets.length?[{t:'tot',l:'− Returned',r:rs(rets.reduce((s,r)=>s+r.total,0)),col:'#0f6b4a'}]:[]),
+  ...(pos?[{t:'big',l:'Khata balance',r:rs(pos.after-(rets.reduce((s,r)=>s+r.total,0))),col:'#b42318'}]:[]),
+  {t:'gap'},{t:'small',s:'Thank you. Please keep this bill for your records.',c:true},{t:'small',s:`${shopName()} · Counter Khata`,c:true}];
+ const canvas=await drawDoc(blocks);
+ const shop=shopName();const name=c?c.name:'';
+ const msg=`Namaste ${name?name+' ji':''} 🙏\n${shop}\nBill #${b.no} · ${fdate(b.date)}\nMedicines: ${rs(b.total)}${lp?`\nPaid now: ${rs(lp.amount)}`:''}${pos?`\nKhata balance: ${rs(pos.after-(rets.reduce((s,r)=>s+r.total,0)))}`:''}\nThank you.`;
+ preview(canvas,`bill-${b.no}`,msg,c?c.phone:'')}
+async function shareStatement(cid,m){const c=client(cid);const s=statement(cid,m);
+ const SC=[[36,'left',130],[170,'left',330],[585,'right',120],[724,'right',130]];
+ const blocks=[{t:'head'},{t:'hr'},{t:'kv',l:'Monthly statement · '+mName(m),r:fdate(today()),bold:true},{t:'kv',l:c.name,r:c.phone||''},{t:'hr'},
+  {t:'tot',wide:true,l:`Brought forward (till ${fdate(addDays(s.start,-1))})`,r:rs(s.bf)},{t:'gap'},
+  {t:'th',cells:['Date','Detail','Amount','Balance'],cols:SC},...s.rows.map(e=>({t:'item',cols:SC,cells:[fdate(e.date),e.text,e.amt<0?'−'+rs(-e.amt):rs(e.amt),rs(e.bal)]})),
+  {t:'hr'},...(s.open?[{t:'tot',l:'Opening balance',r:rs(s.open)}]:[]),{t:'tot',l:'+ Medicines',r:rs(s.meds)},...(s.rets?[{t:'tot',l:'− Returns',r:rs(s.rets)}]:[]),{t:'tot',l:'− Received',r:rs(s.paid),col:'#0f6b4a'},
+  {t:'big',l:s.closing<0?'Advance':'Closing due',r:rs(Math.abs(s.closing)),col:s.closing>0?'#b42318':'#0f6b4a'},{t:'gap'},{t:'small',s:`This closing becomes the opening for ${mName(shiftYM(m,1))}.`,c:true},{t:'small',s:`${shopName()} · Counter Khata`,c:true}];
+ const canvas=await drawDoc(blocks);
+ const msg=`Namaste ${c.name} ji 🙏\n${shopName()} — ${mName(m)} statement\nBrought forward: ${rs(s.bf+s.open)}\nMedicines: ${rs(s.meds)}${s.rets?`\nReturns: −${rs(s.rets)}`:''}\nReceived: −${rs(s.paid)}\n${s.closing<0?'Advance':'Closing due'}: ${rs(Math.abs(s.closing))}\nThank you.`;
+ preview(canvas,`statement-${c.name.replace(/\W+/g,'-')}-${m}`,msg,c.phone)}
+function preview(canvas,fname,msg,phone){const url=canvas.toDataURL('image/png');let file=null;canvas.toBlob(b=>{file=new File([b],fname+'.png',{type:'image/png'})},'image/png');
+ const ov=modal('Share',`<img src="${url}" class="img-prev" alt="Bill preview"><div class="acts"><button class="btn wa" id="sh-go">Share on WhatsApp</button><button class="btn" id="sh-dl">Download</button><button class="btn" id="sh-pr">Print / Save PDF</button></div><p class="hint" id="sh-hint"></p>`);
+ const canFiles=()=>file&&navigator.canShare&&navigator.canShare({files:[file]});
+ $('#sh-hint',ov).textContent=navigator.canShare?'Pick WhatsApp in the share list. The message goes with the bill picture.':'On this device the picture is downloaded and WhatsApp opens with the message. Attach the picture there.';
+ $('#sh-go',ov).onclick=async()=>{if(canFiles()){try{await navigator.share({files:[file],text:msg});return}catch(e){if(e.name==='AbortError')return}}
+  download(fname+'.png',file||await new Promise(r=>canvas.toBlob(r)),'image/png');const p=waPhone(phone);window.open(`https://wa.me/${p}?text=${encodeURIComponent(msg)}`,'_blank','noopener')};
+ $('#sh-dl',ov).onclick=()=>download(fname+'.png',file,'image/png');
+ $('#sh-pr',ov).onclick=()=>{$('#print-area').innerHTML=`<img src="${url}" alt="">`;setTimeout(()=>window.print(),100)}}
+
+/* =================== events =================== */
+const ACT={
+ tab:el=>{if(el.dataset.v==='counter'&&view==='counter')return;go(el.dataset.v)},
+ walkin:()=>{C.cid='walkin';C.paid='';fillCounter()},
+ changeClient:()=>{if(C.edit)return toast('Cancel the edit first');C.cid=null;C.cart=[];C.paid='';fillCounter()},
+ newClient:el=>clientForm(null,el.dataset.from),
+ editClient:(el,id)=>clientForm(client(id)),
+ pickClient:(el,id)=>{C.cid=id;fillCounter();setTimeout(()=>{const q=$('#mq');if(q)q.focus()},50)},
+ refill:(el,id)=>{const r=S.rx.find(x=>x.id===id);if(!r)return;if(C.cid!==r.clientId){C.cid=r.clientId;C.cart=[];C.paid=''}fillCounter();addToCart(r.medId,int(r.usual)||1)},
+ addMed:(el,id)=>{addToCart(id,int(el.dataset.n)||1);const q=$('#mq');if(q&&el.closest('#mq-res')){q.value='';$('#mq-res').innerHTML=''}},
+ repeatLast:()=>{const b=lastBill(C.cid);if(!b)return;let miss=0;for(const it of b.items){if(!med(it.medId)||med(it.medId).archived){miss++;continue}addToCart(it.medId,it.strips,{loose:it.loose,tps:it.tps,disc:it.disc,replace:true})}if(miss)toast(`${miss} item(s) no longer in stock list`);else toast(`Bill #${b.no} copied at today’s prices`)},
+ inc:(el,id,i)=>{C.cart[i].strips=int(C.cart[i].strips)+1;renderCart()},
+ dec:(el,id,i)=>{const l=C.cart[i];l.strips=Math.max(0,int(l.strips)-1);if(!l.strips&&!int(l.loose))C.cart.splice(i,1);renderCart()},
+ rmLine:(el,id,i)=>{C.cart.splice(i,1);renderCart()},
+ mode:el=>{C.mode=el.dataset.v;el.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el))},
+ saveBill:el=>saveBill(!!el.dataset.share),
+ cancelEdit:()=>{resetCounter();render()},
+ openKhata:(el,id)=>{closeAll();go('clients',id)},
+ billFor:(el,id)=>{if(C.edit)resetCounter();if(C.cid!==id){C.cid=id;C.cart=[];C.paid=''}go('counter')},
+ payFor:(el,id)=>payForm(id),
+ monthBill:(el,id)=>monthBill(id),
+ rxNew:(el,id)=>rxForm(id),
+ rxEdit:(el,id)=>{const r=S.rx.find(x=>x.id===id);rxForm(r.clientId,r)},
+ entry:(el,id)=>{const k=el.dataset.kind;if(k==='bill')billModal(id);else if(k==='pay'){const p=S.payments.find(x=>x.id===id);payForm(p.clientId,p)}else if(k==='ret'){const r=S.returns.find(x=>x.id===id);billModal(r.billId)}else if(k==='open')clientForm(client(id))},
+ openBill:(el,id)=>billModal(id),
+ shareBill:(el,id)=>shareBill(id),
+ editBill:(el,id)=>editBill(id),
+ returnBill:(el,id)=>returnBill(id),
+ voidBill:(el,id)=>voidBill(id),
+ medNew:()=>medForm(),
+ medEdit:(el,id)=>medForm(med(id)),
+ rm:el=>{R.m=shiftYM(R.m||thisYM(),+el.dataset.v);if(R.m>thisYM())R.m=thisYM();render()},
+ saveShop:()=>saveShop(),
+ rmLogo:()=>{pendingLogo='';const p=$('#s-logo-prev');if(p)p.style.display='none';toast('Logo will be removed when you save')},
+ changeCap:async()=>{if(!(await askPin('Change the discount cap')))return;const ov=modal('Discount cap',`<label>Highest discount allowed at the counter (%)</label><input id="cap-in" value="${cap()}" inputmode="decimal"><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="cap-ok">Save</button></div>`);$('#cap-ok',ov).onclick=async()=>{const v=num($('#cap-in',ov).value);if(v<0||v>100)return toast('Enter 0 to 100');await commit([{store:'settings',value:{...S.settings,discCap:v}}]);closeModal(ov);toast(`Cap set to ${v}%`);render()}},
+ changePin:async()=>{if(!(await askPin('Enter the current PIN first')))return;const ov=modal('New PIN',`<label>New PIN (4 to 8 digits)</label><input id="np1" type="password" inputmode="numeric" maxlength="8"><label>Type it again</label><input id="np2" type="password" inputmode="numeric" maxlength="8"><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="np-ok">Save PIN</button></div>`);$('#np-ok',ov).onclick=async()=>{const a=$('#np1',ov).value.trim(),b=$('#np2',ov).value.trim();if(!/^\d{4,8}$/.test(a))return toast('Use 4 to 8 digits');if(a!==b)return toast('The two PINs do not match');await commit([{store:'settings',value:{...S.settings,pinHash:await hashPin(a)}}]);pinUntil=0;closeModal(ov);toast('PIN changed. Do not forget it.');render()}},
+ backupJson:()=>backupJson(),
+ restoreJson:()=>$('#f-restore').click(),
+ impClients:()=>$('#f-clients').click(),
+ impStock:()=>$('#f-stock').click(),
+ clearSample:()=>clearPracticeDialog(false),
+ ...ACTS_CSV};
+document.addEventListener('click',async e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(!f)return;e.preventDefault();try{await f(el,el.dataset.id,+el.dataset.i,e)}catch(err){console.error(err);toast('Something went wrong: '+err.message,5000)}});
+document.addEventListener('input',e=>{const t=e.target;
+ if(t.id==='cq'){const q=t.value.trim().toLowerCase(),qd=digits(q);const res=$('#cq-res');if(!q){res.innerHTML='';return}const bal=balances();const list=S.clients.filter(c=>c.name.toLowerCase().includes(q)||(qd.length>=3&&digits(c.phone).includes(qd))).slice(0,8);
+  res.innerHTML=list.map(c=>`<div class="it" data-act="pickClient" data-id="${c.id}"><div><b>${esc(c.name)}</b><div class="mute">${esc(c.phone||'')}</div></div><div class="r ${(bal[c.id]||0)>0?'due':'mute'}">${rs(bal[c.id]||0)}</div></div>`).join('')||`<div class="empty">No match. <button class="btn link" data-act="newClient" data-from="counter">Add as new client</button></div>`}
+ else if(t.id==='mq'){$('#mq-res').innerHTML=searchMeds(t.value).map(m=>medRow(m)).join('')||(t.value.trim()?'<div class="empty">Not in stock list. Add it under Stock.</div>':'')}
+ else if(t.id==='clq')fillClientList(t.value);
+ else if(t.id==='sq')fillStock(t.value);
+ else if(t.id==='paid'){C.paid=t.value;$('#newbal').innerHTML=newBalHtml()}});
+document.addEventListener('change',e=>{const t=e.target;
+ if(t.dataset.f!=null&&t.dataset.i!=null){const l=C.cart[+t.dataset.i];if(!l)return;const f=t.dataset.f;
+  if(f==='disc'){let v=num(t.value);if(v<0)v=0;if(v>cap()){v=cap();toast(`Discount capped at ${cap()}%`)}l.disc=v}
+  else if(f==='tps'){const v=int(t.value);if(v<1){toast('Strip size must be 1 or more');}else l.tps=v}
+  else l[f]=int(t.value);
+  if(int(l.loose)>=l.tps){l.strips=int(l.strips)+Math.floor(int(l.loose)/l.tps);l.loose=int(l.loose)%l.tps}
+  renderCart()}
+ else if(t.id==='bdate'){C.date=t.value&&t.value<=today()?t.value:today();renderCart()}
+ else if(t.id==='rmonth'){if(t.value){R.m=t.value>thisYM()?thisYM():t.value;render()}}
+ else if(t.id==='s-logo'&&t.files[0])readLogo(t.files[0]);
+ else if(t.id==='f-restore'&&t.files[0]){restoreJson(t.files[0]);t.value=''}
+ else if(t.id==='f-clients'&&t.files[0]){importClients(t.files[0]);t.value=''}
+ else if(t.id==='f-stock'&&t.files[0]){importStock(t.files[0]);t.value=''}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.ov'))closeModal()});
+window.addEventListener('beforeunload',e=>{if(C.cart.length){e.preventDefault();e.returnValue=''}});
+
+/* =================== sample shop =================== */
+async function seed(){const T=today(),D=n=>addDays(T,n);const expM=n=>shiftYM(thisYM(),n);
+ const M=[['m1','Metformin SR','500 mg','Metformin',15,3800,10,40,4,14],['m2','Telmisartan','40 mg','Telmisartan',15,9500,10,25,3,18],['m3','Atorvastatin','10 mg','Atorvastatin',15,12000,12,3,4,1],['m4','Amlodipine','5 mg','Amlodipine',15,3200,10,30,3,20],
+  ['m5','Pantoprazole','40 mg','Pantoprazole',15,15500,8,18,3,9],['m6','Glimepiride','1 mg','Glimepiride',10,6500,10,2,3,11],['m7','Thyroxine (bottle)','50 mcg','Levothyroxine',100,18000,5,6,2,2],['m8','Paracetamol','650 mg','Paracetamol',15,3000,0,50,5,24]];
+ const now=Date.now();
+ const meds=M.map(([id,name,strength,salt,tps,mrp,disc,strips,min,exp])=>({id,name,strength,salt,tps,mrp,disc,stockTab:strips*tps,minStrips:min,expiry:expM(exp),archived:false,sample:true,createdAt:now}));
+ const clients=[['c1','Suresh Kumar','9812000001','Model Town',125000],['c2','Harpreet Kaur','9812000002','Sector 7',0],['c3','Kamla Devi','9812000003','Old City',64000],['c4','Rajesh Sharma','9812000004','Railway Road',-20000]].map(([id,name,phone,address,ob],i)=>({id,name,phone,address,openingBal:ob,openingDate:D(-75),sample:true,createdAt:now+i}));
+ const rx=[['r1','c1','m1',2,4,'',''],['r2','c1','m2',1,2,'',''],['r3','c1','m3',1,2,'',''],['r4','c2','m7',1,1,'',5],['r5','c2','m5',1,2,'',''],['r6','c3','m4',1,2,'',''],['r7','c3','m6',1,3,'',''],['r8','c4','m2',1,2,'',12]].map(([id,clientId,medId,dose,usual,tps,disc])=>({id,clientId,medId,dose,usual,tps,disc,doctor:'',startDate:D(-75),active:true,sample:true,createdAt:now}));
+ const mm=Object.fromEntries(meds.map(m=>[m.id,m]));const bills=[],pays=[];let no=0,t=now-1e7;
+ const mk=(cid,date,items,paid,mode)=>{const lines=items.map(([mid,strips,loose=0])=>{const m=mm[mid];const r=rx.find(x=>x.clientId===cid&&x.medId===mid);const disc=Math.min(r&&r.disc!==''?r.disc:m.disc,12);return{medId:mid,name:medLabel(m),salt:m.salt,mrp:m.mrp,medTps:m.tps,tps:m.tps,strips,loose,disc}});
+  const bc=billCalc(lines);const b={id:'b'+(++no),no,clientId:cid,date,items:lines.map(l=>{const c=lineCalc(l);return{...l,tablets:c.tablets,gross:c.gross,discAmt:c.disc,net:c.net}}),gross:bc.gross,disc:bc.disc,roundOff:bc.roundOff,total:bc.total,voided:false,createdAt:pd(date).getTime()+(t+=1000)%86400000,editedAt:null,sample:true};bills.push(b);
+  if(paid)pays.push({id:'p'+no,clientId:cid,date,amount:paid==='full'?bc.total:paid,mode,billId:b.id,note:'',voided:false,createdAt:b.createdAt+1,sample:true})};
+ mk('c1',D(-62),[['m1',4],['m2',2],['m3',2]],0);mk('c2',D(-50),[['m7',1],['m5',2]],30000,'upi');mk('c3',D(-40),[['m4',2],['m6',3]],20000,'cash');mk('c1',D(-32),[['m1',4],['m2',2],['m3',2]],50000,'cash');
+ mk('c4',D(-28),[['m2',2],['m8',1]],30000,'upi');mk('c2',D(-20),[['m7',2],['m5',2]],0);mk('c3',D(-12),[['m4',2],['m6',3]],0);mk('c1',D(-3),[['m1',4],['m2',2]],0);mk(null,T,[['m8',1,5]],'full','cash');
+ pays.push({id:'p-x1',clientId:'c1',date:D(-15),amount:150000,mode:'upi',billId:null,note:'',voided:false,createdAt:pd(D(-15)).getTime()+36e6,sample:true});
+ const settings={id:'shop',name:'',pharmacist:'',phone:'',counter:'',address:'',letterhead:'',logo:'',discCap:12,pinHash:await hashPin('2580'),billSeq:no,lowStrips:2,lastBackup:null};
+ await commit([{store:'settings',value:settings},...meds.map(value=>({store:'meds',value})),...clients.map(value=>({store:'clients',value})),...rx.map(value=>({store:'rx',value})),...bills.map(value=>({store:'bills',value})),...pays.map(value=>({store:'payments',value}))])}
+
+async function start(){
+ if(!window.indexedDB){$('#main').innerHTML='<p class="card">This browser cannot store the khata. Please open it in Chrome.</p>';return}
+ try{await openDB();for(const s of STORES){const all=await getAll(s);if(s==='settings')S.settings=all.find(x=>x.id==='shop')||null;else S[s]=all}if(!S.settings)await seed()}
+ catch(e){$('#main').innerHTML=`<p class="card">Could not open the khata storage (${esc(e.message||e)}). Close other tabs of this page, and do not use private mode.</p>`;return}
+ C.date=today();
+ if(navigator.storage&&navigator.storage.persist){try{persisted=await navigator.storage.persisted()||await navigator.storage.persist()}catch(e){}}
+ render()}
+start();
+</script>
+</body>
+</html>
