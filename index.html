@@ -138,7 +138,7 @@ let view='counter', sub=null;
 
 /* ---------- small helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&','<':'<','>':'>','"':'"',"'":'&#39;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&#38;','<':'&#60;','>':'&#62;','"':'&#34;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const pad=n=>String(n).padStart(2,'0');
 const dstr=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
@@ -340,7 +340,7 @@ function renderCart(){const el=$('#c-cart');if(!el)return;if(!C.cid){el.innerHTM
  <div class="grid2"><div><label>${payMode()==='credit'?'Received now':'Received now (₹)'}</label><input id="paid" value="${payMode()==='credit'?'':esc(C.paid)}" placeholder="${payMode()==='credit'?'Nothing · on khata':'Full '+rs(t.total).replace('₹','₹ ')}" inputmode="decimal" ${payMode()==='credit'?'disabled':''}></div>
  <div><label>Bill date</label><input type="date" id="bdate" value="${C.date}" max="${today()}"></div></div>
  <div id="newbal">${newBalHtml()}</div>
- <div class="acts"><button class="btn pri" data-act="saveBill">${C.edit?'Save changes':'Save'}</button><button class="btn wa" data-act="saveBill" data-share="1">Save & WhatsApp</button></div>
+ <div class="acts"><button class="btn pri" data-act="saveBill">${C.edit?'Save changes':'Save'}</button><button class="btn wa" data-act="saveBill" data-share="1">Save &#38; WhatsApp</button></div>
  ${walk?'':`<p class="hint">${payMode()==='credit'?'Credit: the whole bill goes on the khata.':'Cash/UPI: leave “Received now” blank if the full bill is paid, or type the part paid. The rest goes on the khata.'} The khata carries into next month and is never wiped at month end.</p>`}${C.date<today()?`<p class="hint">Old paper entry: this bill will count in <b>${mName(ymOf(C.date))}</b>.</p>`:''}</div>`}
 function newBalHtml(){const t=finalCalc();if(t.err)return`<div class="hint" style="color:var(--red)">${esc(t.err)}</div>`;const walk=C.cid==='walkin';const paid=paidNow(t.total);
  if(isNaN(paid))return'<div class="hint" style="color:var(--red)">Received amount is not a number.</div>';
