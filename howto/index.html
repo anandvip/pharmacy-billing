@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<!--
+  Counter Khata · Help (how-to + FAQ for pharmacists)
+  Written by Grok Bot for Vipul Anand, 2 Nov 2026. Describes only what index.html (commit c2d23fe) really does.
+  If a button name changes in the app, change it here too.
+
+  DESIGN GUIDELINES FOLLOWED · from Vipul Anand's dated list (anandvip/agentic-claude/index.html)
+  · Single-file, offline-first, vanilla HTML/CSS/JS. No frameworks, no CDN, no analytics.
+  · One subdomain per project via CNAME (pharmacy.vipulanand.in).
+  · Full SEO head: canonical, Open Graph, JSON-LD.
+  · Every abbreviation shows a tooltip bubble with its full form (hover, tap or keyboard); the full form can be copied.
+  · A glossary of all abbreviations sits at the end of the page.
+  · Use asides for tips and warnings.
+  · Mark sections written or revised by Grok Bot with a "Grokcos" pill.
+  · Personal data stays off this page (only the app's made-up sample names appear).
+  · Exception: "Back to app" and the in-page contents links open in the same tab, because this page is part of the app.
+  · Use numeric HTML entities only (the upload connector rewrites named ones).
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f6b4a">
+<title>Help · Counter Khata · How to use it, and what to do when stuck</title>
+<meta name="description" content="Plain-language help for pharmacists using Counter Khata: first-time setup, clients, itemized bills with discount, WhatsApp sharing, payments, fixing bills, backups, CSV import and export, and answers for when you are stuck.">
+<meta name="author" content="Vipul Anand">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://pharmacy.vipulanand.in/howto/">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Counter Khata">
+<meta property="og:title" content="Counter Khata · Help for pharmacists">
+<meta property="og:description" content="Step-by-step help and answers for when you are stuck: bills, khata, WhatsApp, payments, backups.">
+<meta property="og:url" content="https://pharmacy.vipulanand.in/howto/">
+<meta property="og:locale" content="en_IN">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FAQPage","name":"Counter Khata help","url":"https://pharmacy.vipulanand.in/howto/","inLanguage":"en-IN","author":{"@type":"Person","name":"Vipul Anand"},"mainEntity":[
+{"@type":"Question","name":"All my bills and clients have disappeared. What happened?","acceptedAnswer":{"@type":"Answer","text":"Counter Khata keeps everything only in this browser on this phone. Clearing browser data, using private mode, another browser or another phone shows an empty or sample khata. Restore your latest backup file from Shop, Backup, Restore a backup."}},
+{"@type":"Question","name":"WhatsApp does not open, or the PDF does not attach.","acceptedAnswer":{"@type":"Answer","text":"Open the app from its https link in Chrome. If the phone cannot pass the file, use the two taps: Save PDF, then Open WhatsApp chat, and attach the PDF from Downloads."}},
+{"@type":"Question","name":"The total or discount looks wrong.","acceptedAnswer":{"@type":"Answer","text":"Check the pack size, loose units and Discount % on each line. Each line is MRP for the quantity minus its own discount; the bill is rounded to the nearest rupee."}},
+{"@type":"Question","name":"How do I correct a mistake in a saved bill?","acceptedAnswer":{"@type":"Answer","text":"Open the bill and use Change amount, Edit items, Return packs or Void. These need the pharmacist PIN."}}
+]}
+</script>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#6b736f;--line:#e3e1da;--pri:#0f6b4a;--pri2:#e7f3ed;--red:#b42318;--red2:#fdecea;--amb:#8a5a00;--amb2:#fff4d6;--rad:12px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink)}
+header.top{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
+header.top .t{flex:1;min-width:0}
+header.top b{display:block;font-size:16px}
+header.top small{opacity:.85;font-size:12px}
+header.top a.back{color:#fff;border:1px solid rgba(255,255,255,.6);border-radius:10px;padding:7px 12px;text-decoration:none;font-weight:600;font-size:14px;white-space:nowrap}
+main{max-width:760px;margin:0 auto;padding:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px;margin-bottom:12px}
+h1{font-size:22px;margin:4px 0 6px}
+h2{font-size:19px;margin:0 0 8px;color:var(--pri);scroll-margin-top:64px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:6px 0}
+a{color:var(--pri)}
+ol,ul{padding-left:22px;margin:6px 0}
+li{margin:4px 0}
+.mute{color:var(--mute);font-size:14px}
+.b{display:inline-block;padding:0 7px;border:1px solid #d4d1c8;border-radius:7px;background:#fff;font-weight:600;font-size:14px;white-space:nowrap}
+.b.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.b.wa{background:#1f8f4e;border-color:#1f8f4e;color:#fff}
+.b.red{color:var(--red);border-color:#f0c4bf}
+.tab{font-weight:700;color:var(--pri);white-space:nowrap}
+aside{border-radius:10px;padding:10px 12px;margin:10px 0;font-size:15px;background:var(--pri2);color:#0b4a33}
+aside.warn{background:var(--amb2);color:#5c4100}
+aside.stop{background:var(--red2);color:#7a1810}
+aside b:first-child{margin-right:4px}
+nav.toc ol{columns:2;column-gap:24px;padding-left:20px}
+@media(max-width:520px){nav.toc ol{columns:1}}
+nav.toc a{color:var(--pri);font-weight:600;text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+details{border:1px solid var(--line);border-radius:10px;padding:0 12px;margin:8px 0;background:#fff}
+details[open]{padding-bottom:10px}
+summary{cursor:pointer;font-weight:600;padding:11px 0;list-style-position:outside}
+summary:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:6px}
+.pill{display:inline-block;font-size:11px;padding:1px 8px;border-radius:10px;background:#efe7ff;color:#4b2a8a;font-weight:700;vertical-align:middle;letter-spacing:.02em}
+abbr{text-decoration:underline dotted;cursor:help;position:relative}
+abbr:focus-visible{outline:2px solid var(--pri);outline-offset:1px;border-radius:3px}
+#tip{position:fixed;z-index:30;max-width:280px;background:#1d2421;color:#fff;padding:8px 10px;border-radius:10px;font-size:14px;box-shadow:0 4px 14px rgba(0,0,0,.25);display:none}
+#tip button{margin-left:8px;font:inherit;font-size:12px;border:1px solid rgba(255,255,255,.5);background:none;color:#fff;border-radius:6px;padding:1px 7px;cursor:pointer}
+table.g{width:100%;border-collapse:collapse;font-size:15px}
+table.g td,table.g th{padding:7px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+table.g th{font-size:13px;color:var(--mute)}
+table.g .b{white-space:normal}
+table.g td{overflow-wrap:anywhere}
+.backbar{text-align:center;margin:18px 0 6px}
+.backbar a{display:inline-block;background:var(--pri);color:#fff;text-decoration:none;font-weight:700;border-radius:10px;padding:11px 20px}
+footer{text-align:center;font-size:12px;color:var(--mute);padding:10px 0 24px}
+@media print{header.top,.backbar,#tip{display:none}details{border:0}body{background:#fff}.card{border:0;padding:0 0 8px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="t"><b>Counter Khata · Help</b><small>How to, and what to do when stuck</small></div><a class="back" href="../">&#8592; Back to app</a></header>
+<main>
+
+<div class="card" id="intro">
+<h1>Help for the counter</h1>
+<p>Counter Khata is a day book for your pharmacy counter. It makes a clean, itemized bill with the discount on every line. It keeps each client&#8217;s khata (credit book) and sends bills on WhatsApp.</p>
+<p>Everything is saved <b>only on this phone, in this browser</b>. Nothing goes to any server. So please keep backups.</p>
+<p>Find your task in the list below. Each one has short numbered steps. If something goes wrong, see <a href="#stuck">When you&#8217;re stuck</a>.</p>
+<p class="mute">Words in <span class="b">boxes</span> are buttons, written exactly as they appear in the app. Words in <span class="tab">green</span> are the tabs in the bottom bar: <span class="tab">Counter</span>, <span class="tab">Clients</span>, <span class="tab">Stock</span>, <span class="tab">Reports</span>, <span class="tab">Shop</span> and <span class="tab">Help</span>. Tap a dotted word to see what it stands for.</p>
+<p class="mute"><span class="pill" title="Written by Grok Bot">Grokcos</span> Every section on this page was written by Grok Bot on 2 Nov 2026 from the app itself.</p>
+</div>
+
+<nav class="card toc" aria-label="Contents">
+<h2>Contents</h2>
+<ol>
+<li><a href="#setup">First-time setup</a></li>
+<li><a href="#practice">Practice mode and clearing sample data</a></li>
+<li><a href="#client">Add a client</a></li>
+<li><a href="#stock">Add medicines to stock</a></li>
+<li><a href="#bill">Make an itemized bill with discount</a></li>
+<li><a href="#walkin">Walk-in cash sale</a></li>
+<li><a href="#whatsapp">Send the bill on WhatsApp, or print it</a></li>
+<li><a href="#payment">Record a payment</a></li>
+<li><a href="#fix">Fix a saved bill</a></li>
+<li><a href="#balance">Find a client&#8217;s balance</a></li>
+<li><a href="#month">Send a month bill</a></li>
+<li><a href="#rx">Prescriptions and refill reminders</a></li>
+<li><a href="#reports">Reports</a></li>
+<li><a href="#csv">Import and export with Excel</a></li>
+<li><a href="#backup">Back up and restore</a></li>
+<li><a href="#pin">PIN and discount limit</a></li>
+<li><a href="#stuck">When you&#8217;re stuck (FAQ)</a></li>
+<li><a href="#glossary">Glossary</a></li>
+</ol>
+</nav>
+
+<section class="card" id="setup">
+<h2>1. First-time setup</h2>
+<p>The first time you open the app, it shows a <b>sample shop</b> so you can practise.</p>
+<ol>
+<li>Open the app in <b>Chrome</b> from its link, <b>https://pharmacy.vipulanand.in</b>. Do not use private (incognito) mode.</li>
+<li>Tap <span class="tab">Shop</span>.</li>
+<li>Type your <b>Shop name</b>. This is the only field you must fill.</li>
+<li>Fill the rest if you like: Pharmacist name, Shop phone, Counter person&#8217;s name, Address, and Letterhead line (drug licence no., <abbr data-full="Goods and Services Tax Identification Number">GSTIN</abbr>).</li>
+<li>To add a logo, tap the <b>Logo</b> file box and pick a picture.</li>
+<li>Tap <span class="b pri">Save shop details</span>. Your shop name now prints on every bill.</li>
+<li>The app now asks whether to clear the practice books. See <a href="#practice">Practice mode</a>.</li>
+<li>Change the sample <abbr data-full="Personal Identification Number">PIN</abbr> 2580 to your own: <span class="b">Change PIN</span> (see <a href="#pin">PIN</a>).</li>
+</ol>
+<aside><b>Tip:</b> The low-stock alert number on the Shop screen is how many packs count as &#8220;low&#8221;. The default is 2.</aside>
+</section>
+
+<section class="card" id="practice">
+<h2>2. Practice mode and clearing sample data</h2>
+<p>Until you save a real shop name, the app is in <b>practice mode</b>. The title shows &#8220;(practice)&#8221;. The sample clients are Suresh Kumar, Harpreet Kaur, Kamla Devi and Rajesh Sharma, with sample stock and bills. Anything you type in practice mode is marked as practice.</p>
+<h3>Clear the sample data</h3>
+<ol>
+<li>Save your shop name in <span class="tab">Shop</span>. A box called <b>Clear practice books</b> opens.</li>
+<li>If you only practised, keep the tick on <b>&#8220;Also remove the &#8230; entries typed while practising&#8221;</b>.</li>
+<li>If you already typed <b>real</b> clients or stock before saving the shop name, <b>untick</b> it so they stay.</li>
+<li>Tap <span class="b red">Clear practice books</span>. Or tap <span class="b">Not now</span> to do it later.</li>
+</ol>
+<p>Later, you can clear it from the yellow banner (<span class="b">Clear them</span>) or from <span class="tab">Shop</span> &#8594; <span class="b red">Clear practice data</span>. These ask for the PIN.</p>
+<aside class="warn"><b>Note:</b> A sample client or medicine that is used in one of your real bills is kept, so your real bill stays correct.</aside>
+</section>
+
+<section class="card" id="client">
+<h2>3. Add a client</h2>
+<ol>
+<li>Tap <span class="tab">Clients</span>, then <span class="b pri">+ New client</span>. (On <span class="tab">Counter</span> you can also tap <span class="b">+ New client</span>.)</li>
+<li>Type the <b>Name</b>. Phone is optional but needed for WhatsApp. Use 10 digits.</li>
+<li>Coming from a paper book? Type the <b>Opening balance (&#8377;)</b> and the <b>As on date</b>. Use a minus sign for an advance.</li>
+<li>Tap <span class="b pri">Save client</span>.</li>
+</ol>
+<aside class="warn"><b>Do not count twice:</b> If you enter an opening balance, do not also enter the old bills from before that date.</aside>
+<p>To change details later, open the client and tap <span class="b">Edit client</span>. Changing the opening balance asks for the PIN.</p>
+</section>
+
+<section class="card" id="stock">
+<h2>4. Add medicines to stock</h2>
+<p>A bill can only use medicines that are in the stock list.</p>
+<ol>
+<li>Tap <span class="tab">Stock</span>, then <span class="b pri">+ Add medicine</span>.</li>
+<li>Fill <b>Name</b>, and Strength / size if any (for example 500 mg).</li>
+<li>Pick the <b>Type</b> (Tablet, Syrup, Injection, Inhaler and so on). The pack and unit fill in by themselves.</li>
+<li>Check <b>Units in one pack</b> (for example 15 tablets in one strip) and <b>Sell loose?</b></li>
+<li>Type the <b><abbr data-full="Maximum Retail Price">MRP</abbr> per pack</b> and the <b>Usual discount %</b>.</li>
+<li>Type how many packs are on the shelf now, and the nearest <b>Expiry</b>.</li>
+<li>Tap <span class="b pri">Save</span>.</li>
+</ol>
+<h3>Change stock later</h3>
+<ul>
+<li>On the Stock screen, tap any value to change it. It saves when you tap away. Enter also saves, Esc cancels.</li>
+<li>For shelf count, type packs, or packs+loose like <b>12+5</b>.</li>
+<li>For new stock received, or to hide a medicine, tap <span class="b">&#8943;</span>. Then use <b>New stock received</b>, or <span class="b red">Hide from list</span> / <span class="b red">Delete</span>.</li>
+</ul>
+<aside><b>Badges:</b> <b>low</b> means below the low-stock alert, <b>out</b> means none on the shelf, <b>exp</b> means it expires within 60 days.</aside>
+</section>
+
+<section class="card" id="bill">
+<h2>5. Make an itemized bill with discount</h2>
+<ol>
+<li>Tap <span class="tab">Counter</span>. Under <b>Who is buying?</b> type the client&#8217;s name or phone, and tap the client.</li>
+<li>Add medicines in any of these ways:
+ <ul>
+ <li>Tap a green chip such as <b>+ Metformin SR 500 mg &#215;4</b> (usual medicines).</li>
+ <li>Tap <span class="b">Repeat last bill</span> to copy the last bill at today&#8217;s prices.</li>
+ <li>Search under <b>Add medicine</b> and tap the medicine.</li>
+ </ul></li>
+<li>On each line, set the number of packs with <b>&#8722;</b> and <b>+</b>. Add <b>Loose</b> units if you sell part of a strip.</li>
+<li>Check the <b>Discount %</b> on each line. It starts at the medicine&#8217;s usual discount (or the client&#8217;s prescription discount). Change it if needed.</li>
+<li>Check the totals: <b>MRP total</b>, <b>Discount</b>, <b>Round off</b>, <b>Bill total</b> and <b>Net savings on this bill</b>.</li>
+<li>Under <b>Paid by</b>, pick <span class="b">Cash</span>, <span class="b">UPI</span> or <span class="b">Credit</span>.
+ <ul>
+ <li>Cash or UPI: leave <b>Received now</b> blank if the full bill is paid. Type the amount if only part is paid. The rest goes on the khata.</li>
+ <li>Credit: the whole bill goes on the khata.</li>
+ </ul></li>
+<li>Entering an old paper bill? Change the <b>Bill date</b>. It cannot be a future date.</li>
+<li>Check <b>Khata after this bill</b>, then tap <span class="b pri">Save</span>, or <span class="b wa">Save &#38; WhatsApp</span> to send it at once.</li>
+</ol>
+<h3>Charge a different amount</h3>
+<p>Tap <span class="b">&#9998; Change</span> next to the Bill total. Type the amount under <b>Charge this amount instead (&#8377;)</b>. It cannot be more than the MRP total. Tap <span class="b">Use calculated</span> to go back.</p>
+<aside><b>How the maths works:</b> each line is MRP for the quantity, minus that line&#8217;s discount %. The lines are added, then the bill is rounded to the nearest rupee.</aside>
+<aside class="warn"><b>Red message on a line?</b> &#8220;Shelf shows only &#8230;&#8221; means stock looks short. You can still save, but please recount the shelf.</aside>
+</section>
+
+<section class="card" id="walkin">
+<h2>6. Walk-in cash sale</h2>
+<ol>
+<li>On <span class="tab">Counter</span>, tap <span class="b">Walk-in cash sale</span>.</li>
+<li>Add medicines as in <a href="#bill">step 5</a>.</li>
+<li>Pick <span class="b">Cash</span> or <span class="b">UPI</span>. Type the money handed over in <b>Received now</b> to see <b>Return change</b>.</li>
+<li>Tap <span class="b pri">Save</span>.</li>
+</ol>
+<p>A walk-in sale must be paid in full. It cannot go on credit. To give credit, pick or add a client instead.</p>
+</section>
+
+<section class="card" id="whatsapp">
+<h2>7. Send the bill on WhatsApp, or print it</h2>
+<ol>
+<li>Tap <span class="b wa">Save &#38; WhatsApp</span> when saving. For an old bill, open it (tap it in <b>Today at the counter</b> or in the client&#8217;s khata) and tap <span class="b wa">Send itemized PDF</span>.</li>
+<li>The <b>Send to client</b> box shows the bill picture. Wait for &#8220;&#10003; Itemized PDF ready&#8221;.</li>
+<li>Tap <span class="b wa">Send PDF on WhatsApp</span>. Choose <b>WhatsApp</b>, then the client. The PDF and the itemized message go together.</li>
+</ol>
+<h3>If the phone cannot pass the file</h3>
+<p>A yellow box <b>Two taps instead</b> appears:</p>
+<ol>
+<li>Tap <span class="b">&#9312; Save PDF</span>. It goes to Downloads.</li>
+<li>Tap <span class="b wa">&#9313; Open WhatsApp chat</span>. The itemized message is already typed.</li>
+<li>In WhatsApp tap &#128206; &#8594; Document, and pick the saved PDF.</li>
+</ol>
+<h3>Other buttons in the same box</h3>
+<ul>
+<li><span class="b">Send picture</span> sends the bill as a picture.</li>
+<li><span class="b">Download PDF</span> and <span class="b">Open PDF</span> save or show the PDF.</li>
+<li><span class="b">Copy itemized text</span> copies the message, to paste anywhere.</li>
+<li><span class="b">Print</span> prints the bill picture on a connected printer.</li>
+<li><b>See the WhatsApp message</b> shows the exact text the client gets.</li>
+</ul>
+</section>
+
+<section class="card" id="payment">
+<h2>8. Record a payment</h2>
+<p>Use this when a client pays money towards the khata, without a new bill.</p>
+<ol>
+<li>Tap <span class="tab">Clients</span> and tap the client.</li>
+<li>Tap <span class="b">Amount received</span>.</li>
+<li>Type the <b>Amount (&#8377;)</b>. Pick <span class="b">Cash</span> or <span class="b">UPI</span>.</li>
+<li>Change the <b>Date</b> if it was paid earlier. Add a <b>Note</b> if you like.</li>
+<li>Check <b>Pending after</b>, then tap <span class="b pri">Save payment</span>.</li>
+</ol>
+<p>The payment goes against the running balance, not against one medicine. Money paid more than the balance shows as an <b>advance</b>.</p>
+<aside class="warn"><b>Wrong payment?</b> Tap it in the khata and tap <span class="b red">Delete payment</span> (needs the PIN). Then enter it again correctly. A payment taken with a bill is changed from the bill instead.</aside>
+</section>
+
+<section class="card" id="fix">
+<h2>9. Fix a saved bill</h2>
+<p>Open the bill (tap it in <b>Today at the counter</b>, or in the client&#8217;s khata). Pick what you need. Each one asks for the pharmacist PIN.</p>
+<table class="g">
+<thead><tr><th>Problem</th><th>Button</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Only the amount is wrong</td><td><span class="b">&#9998; Change amount</span></td><td>Type the new amount and an optional reason, then <span class="b pri">Save amount</span>. Medicines and stock stay the same. <span class="b">Back to calculated</span> undoes it.</td></tr>
+<tr><td>Wrong medicine, quantity, discount, date or payment</td><td><span class="b">Edit items</span></td><td>The bill opens on Counter with &#8220;Editing bill #&#8230;&#8221;. Fix it and tap <span class="b pri">Save changes</span>. <span class="b">Cancel edit</span> leaves it as it was.</td></tr>
+<tr><td>Client brought medicine back</td><td><span class="b">Return packs</span></td><td>Type the packs or loose units coming back, then <span class="b pri">Save return</span>. Stock goes back on the shelf. The refund is at the price charged after discount.</td></tr>
+<tr><td>Bill should not exist</td><td><span class="b red">Void</span></td><td>Medicines go back on the shelf. Money received with it is removed (hand it back). The bill stays in the list, crossed out.</td></tr>
+</tbody>
+</table>
+<aside class="warn"><b>Old month:</b> Changing a bill from an earlier month also changes that month&#8217;s statement and every closing after it. The app asks you first.</aside>
+<aside><b>A bill with a return</b> cannot be edited. Make another return, or void the bill and make a new one.</aside>
+</section>
+
+<section class="card" id="balance">
+<h2>10. Find a client&#8217;s balance</h2>
+<ol>
+<li>Tap <span class="tab">Clients</span>. The list shows everyone, highest pending first, with the total pending at the top.</li>
+<li>Type a name or phone in the search box to find one client.</li>
+<li>Tap the client. The big number on the right is <b>Pending</b> (red) or <b>Advance</b> (green).</li>
+<li>Below it, <b>Khata &#183; newest first</b> lists every bill, return and payment with the running balance. Tap a line to open it.</li>
+</ol>
+<p>On <span class="tab">Counter</span>, after you pick a client, their <b>Pending khata</b> shows at the top right. Tap it to open the khata. Tap <span class="b">&#8592; All clients</span> to go back to the list.</p>
+</section>
+
+<section class="card" id="month">
+<h2>11. Send a month bill</h2>
+<ol>
+<li>Open the client and tap <span class="b">Month bill</span>.</li>
+<li>Pick the <b>Month</b>. In the first 10 days of a month, it starts at last month.</li>
+<li>Check: Brought forward, + Medicines this month, &#8722; Returns, &#8722; Money received, and <b>Closing due</b>.</li>
+<li>Keep <b>Itemized</b> ticked to show every medicine with quantity and discount. Untick for a short statement.</li>
+<li>Tap <span class="b wa">Send statement PDF</span>. Sending works as in <a href="#whatsapp">step 7</a>.</li>
+</ol>
+<p>The khata is never wiped at month end. This month&#8217;s closing is next month&#8217;s opening, by itself.</p>
+</section>
+
+<section class="card" id="rx">
+<h2>12. Prescriptions and refill reminders</h2>
+<ol>
+<li>Open the client and tap <span class="b">+ Add prescription</span>.</li>
+<li>Pick the <b>Medicine</b>. Type the <b>Dose</b> and <b>Every</b> (day, week or month).</li>
+<li>Type the usual packs per visit. Optional: this client&#8217;s discount %, pack size for this client, doctor, start date.</li>
+<li>Tap <span class="b pri">Save</span>.</li>
+</ol>
+<p>The app works out the next refill date from what the client actually bought and the dose. Refills due in the next 3 days show on <span class="tab">Counter</span> under <b>Refills due</b>. Tap one to start that bill. &#9200; on a chip means a refill is near.</p>
+<p>To stop one, open it and untick <b>Still taking this medicine</b>.</p>
+</section>
+
+<section class="card" id="reports">
+<h2>13. Reports</h2>
+<p>Tap <span class="tab">Reports</span>. Use <b>&#8249;</b> and <b>&#8250;</b> or the month box to pick a month. You see:</p>
+<ul>
+<li>Billed, Collected, Still due, and number of bills with the average.</li>
+<li>A six-month chart of billed and collected.</li>
+<li>Top medicines, Highest pending today, Low stock, and medicines expiring within 60 days.</li>
+<li>Excel buttons: <span class="b">Month statements (all clients)</span> and <span class="b">This month&#8217;s bills</span>.</li>
+</ul>
+</section>
+
+<section class="card" id="csv">
+<h2>14. Import and export with Excel (<abbr data-full="Comma-Separated Values">CSV</abbr>)</h2>
+<h3>Export</h3>
+<p>Tap <span class="tab">Shop</span>, then under <b>Excel (CSV)</b> tap one: <span class="b">Khata entries</span>, <span class="b">All bills with items</span>, <span class="b">Clients + balance</span> or <span class="b">Stock</span>. The file downloads and opens in Excel or Google Sheets.</p>
+<h3>Import clients or stock</h3>
+<ol>
+<li>Tap <span class="b">Clients template</span> or <span class="b">Stock template</span> to download a sample sheet with the right columns.</li>
+<li>Fill it in Excel or Google Sheets. Keep the first row (column names) as it is.</li>
+<li>Save or download it as <b>CSV</b>.</li>
+<li>Tap <span class="b">Import clients</span> or <span class="b">Import stock</span> and pick the file.</li>
+<li>A box shows how many were added, updated or skipped, and why.</li>
+</ol>
+<aside class="warn"><b>Good to know:</b> A client with a phone number already in the app is skipped. A stock row with the same name and strength as an existing medicine <b>updates</b> it, and the shelf count becomes the number in the sheet (it is not added on top).</aside>
+</section>
+
+<section class="card" id="backup">
+<h2>15. Back up and restore</h2>
+<p>If this phone is lost or the browser is cleared, the khata goes with it. A backup file is the only way to get it back.</p>
+<h3>Back up (once a week)</h3>
+<ol>
+<li>Tap <span class="tab">Shop</span>, then <span class="b pri">Download full backup</span>. (Or tap <span class="b">Back up</span> on the yellow banner.)</li>
+<li>A file named like <b>counter-khata-&#8230;.json</b> goes to Downloads.</li>
+<li>Send it to yourself on WhatsApp, or save it to Google Drive.</li>
+</ol>
+<p>The app shows a yellow reminder if you have real entries and no backup in the last 7 days.</p>
+<h3>Restore, or move to a new phone</h3>
+<ol>
+<li>Put the backup file on the phone.</li>
+<li>Open the app, tap <span class="tab">Shop</span>, then <span class="b">Restore a backup</span>, and pick the file.</li>
+<li>Type the PIN, then tap <span class="b red">Replace everything</span>.</li>
+</ol>
+<aside class="stop"><b>Careful:</b> Restore replaces everything on this phone with the backup. It cannot be undone. On a new phone the PIN is the sample 2580 until the backup is restored.</aside>
+</section>
+
+<section class="card" id="pin">
+<h2>16. PIN and discount limit</h2>
+<p>The pharmacist PIN protects changes to money: changing a bill amount, editing, returns, voids, deleting a payment, changing an opening balance, clearing practice data and restoring. Once typed, it stays unlocked for 5 minutes.</p>
+<h3>Change the PIN</h3>
+<ol>
+<li>Tap <span class="tab">Shop</span> &#8594; <span class="b">Change PIN</span>. Type the current PIN (sample: 2580).</li>
+<li>Type a new PIN of 4 to 8 digits, twice. Tap <span class="b pri">Save PIN</span>.</li>
+</ol>
+<h3>Set a discount limit</h3>
+<ol>
+<li>Tap <span class="tab">Shop</span> &#8594; <span class="b">Set a limit</span> (or <span class="b">Change or remove limit</span>).</li>
+<li>Type the highest discount % allowed at the counter. Leave blank or 0 for no limit.</li>
+<li>Tap <span class="b pri">Save</span>.</li>
+</ol>
+<p>With a limit, a line discount cannot go above it. A changed bill amount that cuts deeper than the limit asks for the PIN.</p>
+<aside class="warn"><b>Forgot the PIN?</b> The app has no PIN reset. Keep it written somewhere safe.</aside>
+</section>
+
+<section class="card" id="stuck">
+<h2>17. When you&#8217;re stuck</h2>
+
+<details><summary>All my bills and clients have disappeared. What happened?</summary>
+<p>Counter Khata keeps everything <b>only in this browser on this phone</b>. You will see an empty or sample khata if:</p>
+<ul><li>browser data or site data was cleared, or a cleaner app ran,</li><li>you opened it in private (incognito) mode,</li><li>you opened it in another browser, or on another phone,</li><li>the phone ran low on space and the browser cleaned up.</li></ul>
+<p><b>Fix:</b> open it again in the same browser you always use. If the data is really gone, restore your latest backup: <span class="tab">Shop</span> &#8594; <span class="b">Restore a backup</span>. See <a href="#backup">Back up and restore</a>.</p>
+<p>At the bottom of <span class="tab">Shop</span> the app says whether storage is protected from automatic clean-up.</p>
+</details>
+
+<details><summary>WhatsApp does not open, or the PDF does not attach.</summary>
+<ul>
+<li>Open the app from its <b>https</b> link in Chrome, not as a saved file. A file copy cannot pass files to WhatsApp.</li>
+<li>Use the <b>Two taps instead</b> box: <span class="b">&#9312; Save PDF</span>, then <span class="b wa">&#9313; Open WhatsApp chat</span>, then attach the PDF from Downloads.</li>
+<li>If WhatsApp opens without the client&#8217;s chat, the client&#8217;s phone is missing or is not 10 digits. Fix it with <span class="b">Edit client</span>.</li>
+<li>If the PDF says it could not be made, use <span class="b">Send picture</span> or <span class="b">Copy itemized text</span>.</li>
+</ul>
+</details>
+
+<details><summary>The total or the discount looks wrong.</summary>
+<ul>
+<li>Check <b>Units in one pack</b> on the line. MRP is per pack, so a wrong pack size changes the price of loose units.</li>
+<li>Check the <b>Discount %</b> on each line. It starts at the medicine&#8217;s usual discount, or the client&#8217;s prescription discount.</li>
+<li>If a discount limit is set, a higher discount is cut down to the limit.</li>
+<li>The Bill total is rounded to the nearest rupee. The Round off line shows the difference.</li>
+<li>If someone used <span class="b">&#9998; Change</span>, you will see &#8220;Changed by pharmacist&#8221;. Tap <span class="b">Use calculated</span> to undo it before saving.</li>
+<li>For wrong MRP or discount in stock, fix it on the <span class="tab">Stock</span> screen. Old bills keep the price they were saved with.</li>
+</ul>
+</details>
+
+<details><summary>I saved a bill with a mistake. How do I correct it?</summary>
+<p>Open the bill and use <span class="b">&#9998; Change amount</span>, <span class="b">Edit items</span>, <span class="b">Return packs</span> or <span class="b red">Void</span>. See <a href="#fix">Fix a saved bill</a>. A bill is never deleted. A voided bill stays, crossed out, so the record is honest.</p>
+</details>
+
+<details><summary>I entered a wrong payment.</summary>
+<p>Open the client, tap the payment line in the khata, tap <span class="b red">Delete payment</span> and type the PIN. Then use <span class="b">Amount received</span> again. If it came with a bill, fix it with <span class="b">Edit items</span> on that bill.</p>
+</details>
+
+<details><summary>Which entries are practice and which are real?</summary>
+<p>Anything typed <b>before</b> you save a shop name in <span class="tab">Shop</span> is practice. The title says &#8220;(practice)&#8221; while you are in practice mode. After you save the shop name, new entries are real.</p>
+<p>When you clear practice data, untick <b>Also remove the &#8230; entries typed while practising</b> if some of those were real. See <a href="#practice">Practice mode</a>.</p>
+</details>
+
+<details><summary>Does it work without internet?</summary>
+<p>Bills, khata, stock and backups are all saved on the phone, so they do not need internet once the app is open. Sending on WhatsApp needs internet.</p>
+<p>Right now, opening the app page itself may need internet. Keep the tab open in Chrome during the day. Full &#8220;install to home screen&#8221; and offline opening are not ready yet.</p>
+</details>
+
+<details><summary>Can I print a bill?</summary>
+<p>Yes. Open the bill, tap <span class="b wa">Send itemized PDF</span>, and in the box tap <span class="b">Print</span>. Or tap <span class="b">Download PDF</span> and print the PDF. A month statement prints the same way from <span class="b">Month bill</span> &#8594; <span class="b wa">Send statement PDF</span>.</p>
+</details>
+
+<details><summary>It asks for a PIN. What is it?</summary>
+<p>It is the pharmacist PIN. On a new or practice setup it is <b>2580</b>. Change it under <span class="tab">Shop</span> &#8594; <span class="b">Change PIN</span>. See <a href="#pin">PIN and discount limit</a>.</p>
+</details>
+
+<details><summary>A medicine is not found when I search on Counter.</summary>
+<p>It is not in the stock list, or it was hidden. Add it in <span class="tab">Stock</span> with <span class="b pri">+ Add medicine</span>. You can search by name or by salt.</p>
+</details>
+
+<details><summary>Stock shows below zero, or &#8220;Shelf went below zero&#8221;.</summary>
+<p>More was sold than the shelf count in the app. Count the shelf, then on <span class="tab">Stock</span> tap <b>On shelf</b> for that medicine and type the real count (packs, or packs+loose like 12+5).</p>
+</details>
+
+<details><summary>&#8220;Walk-in sale must be paid in full&#8221;.</summary>
+<p>A walk-in customer has no khata, so the sale cannot go on credit. Tap <span class="b">Change</span> and pick the client, or add them with <span class="b">+ New client</span>.</p>
+</details>
+
+<details><summary>&#8220;Bill date cannot be in the future&#8221;, or a date problem.</summary>
+<p>The app uses the phone&#8217;s date. Check the phone&#8217;s date and time settings. Old paper bills can be entered with an earlier <b>Bill date</b>.</p>
+</details>
+
+<details><summary>I tapped Help and the browser asked &#8220;Leave site?&#8221;.</summary>
+<p>A bill was still open on Counter and not saved. Tap Cancel, save the bill first, then open Help.</p>
+</details>
+
+<details><summary>&#8220;Could not open the khata storage&#8221;.</summary>
+<p>Close other tabs of this app, do not use private mode, and open it again in Chrome.</p>
+</details>
+</section>
+
+<section class="card" id="glossary">
+<h2>Glossary</h2>
+<p class="mute">Tap a dotted word anywhere on this page to see its full form and copy it.</p>
+<table class="g">
+<thead><tr><th>Short</th><th>Full form</th><th>What it means here</th></tr></thead>
+<tbody>
+<tr><td><abbr data-full="Comma-Separated Values">CSV</abbr></td><td>Comma-Separated Values</td><td>A simple sheet file that Excel and Google Sheets open.</td></tr>
+<tr><td><abbr data-full="Goods and Services Tax Identification Number">GSTIN</abbr></td><td>Goods and Services Tax Identification Number</td><td>Can go on the letterhead line.</td></tr>
+<tr><td><abbr data-full="Hypertext Transfer Protocol Secure">HTTPS</abbr></td><td>Hypertext Transfer Protocol Secure</td><td>The safe web link the app must be opened from.</td></tr>
+<tr><td><abbr data-full="JavaScript Object Notation">JSON</abbr></td><td>JavaScript Object Notation</td><td>The type of the backup file.</td></tr>
+<tr><td>Khata</td><td>Credit book</td><td>Each client&#8217;s running account of bills, returns and payments.</td></tr>
+<tr><td><abbr data-full="Maximum Retail Price">MRP</abbr></td><td>Maximum Retail Price</td><td>Price printed on the pack. A bill can never be more than the MRP total.</td></tr>
+<tr><td><abbr data-full="Portable Document Format">PDF</abbr></td><td>Portable Document Format</td><td>The bill file sent on WhatsApp.</td></tr>
+<tr><td><abbr data-full="Personal Identification Number">PIN</abbr></td><td>Personal Identification Number</td><td>The pharmacist&#8217;s secret number for money changes.</td></tr>
+<tr><td><abbr data-full="Unified Payments Interface">UPI</abbr></td><td>Unified Payments Interface</td><td>Phone payment (GPay, PhonePe, Paytm and others).</td></tr>
+</tbody>
+</table>
+</section>
+
+<div class="backbar"><a href="../">&#8592; Back to app</a></div>
+</main>
+<footer>Counter Khata &#183; &#169; 2026 &#183; Created by Vipul Anand, Kurukshetra</footer>
+<div id="tip" role="tooltip"><span id="tip-t"></span><button type="button" id="tip-c">Copy</button></div>
+<script>
+'use strict';
+/* tooltip bubble with the full form for every abbreviation: hover, tap or keyboard; Copy button copies it */
+(function(){
+ var tip=document.getElementById('tip'),tt=document.getElementById('tip-t'),cb=document.getElementById('tip-c'),cur=null;
+ var abbrs=document.querySelectorAll('abbr[data-full]');
+ for(var i=0;i<abbrs.length;i++){abbrs[i].setAttribute('tabindex','0');abbrs[i].setAttribute('title',abbrs[i].getAttribute('data-full'));abbrs[i].setAttribute('aria-label',abbrs[i].textContent+': '+abbrs[i].getAttribute('data-full'))}
+ function show(a){cur=a;a.removeAttribute('title');tt.textContent=a.textContent+' = '+a.getAttribute('data-full');cb.textContent='Copy';tip.style.display='block';
+  var r=a.getBoundingClientRect(),w=tip.offsetWidth,h=tip.offsetHeight,x=Math.max(8,Math.min(r.left,window.innerWidth-w-8)),y=r.bottom+6;
+  if(y+h>window.innerHeight-8)y=r.top-h-6;tip.style.left=x+'px';tip.style.top=y+'px'}
+ function hide(){if(cur)cur.setAttribute('title',cur.getAttribute('data-full'));cur=null;tip.style.display='none'}
+ document.addEventListener('mouseover',function(e){var a=e.target.closest('abbr[data-full]');if(a)show(a)});
+ document.addEventListener('mouseout',function(e){var a=e.target.closest('abbr[data-full]');if(a&&!tip.contains(e.relatedTarget))setTimeout(function(){if(!tip.matches(':hover'))hide()},250)});
+ document.addEventListener('focusin',function(e){var a=e.target.closest('abbr[data-full]');if(a)show(a)});
+ document.addEventListener('click',function(e){var a=e.target.closest('abbr[data-full]');if(a){show(a);return}if(!tip.contains(e.target))hide()});
+ document.addEventListener('keydown',function(e){if(e.key==='Escape')hide()});
+ window.addEventListener('scroll',hide,{passive:true});
+ cb.addEventListener('click',function(){if(!cur)return;var t=cur.getAttribute('data-full');
+  var done=function(){cb.textContent='Copied'};
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(done,function(){fallback(t);done()})}else{fallback(t);done()}});
+ function fallback(t){var x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();try{document.execCommand('copy')}catch(err){}x.remove()}
+})();
+</script>
+</body>
+</html>
