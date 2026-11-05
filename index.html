@@ -249,7 +249,7 @@ function ledger(cid){const c=client(cid);const E=[];
  for(const b of S.bills)if(b.clientId===cid&&!b.voided)E.push({date:b.date,k:1,kind:'bill',text:`Bill #${b.no} · ${b.items.length} item${b.items.length>1?'s':''}`,amt:b.total,ref:b.id,t:b.createdAt});
  for(const r of S.returns)if(r.clientId===cid&&!r.voided)E.push({date:r.date,k:2,kind:'ret',text:`Return on bill #${billNo(r.billId)}`,amt:-r.total,ref:r.id,t:r.createdAt});
  for(const p of S.payments)if(p.clientId===cid&&!p.voided)E.push({date:p.date,k:3,kind:'pay',text:`Received · ${p.mode==='upi'?'UPI':'Cash'}${p.billId?' (with bill #'+billNo(p.billId)+')':''}${p.note?' · '+p.note:''}`,amt:-p.amount,ref:p.id,t:p.createdAt});
- E.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.k-b.k)||(a.t-b.t));
+ E.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:(a.t-b.t)||(a.k-b.k));
  let bal=0;for(const e of E){bal+=e.amt;e.bal=bal}return E}
 
 /* month bill: brought forward + medicines − returns − received = closing due */
@@ -361,7 +361,7 @@ function renderCart(){const el=$('#c-cart');if(!el)return;if(!C.cid){el.innerHTM
  <div id="ovr-box" ${C.ovrOpen?'':'hidden'}><label for="ovr">Charge this amount instead (₹)</label><div class="row"><input id="ovr" class="grow" value="${esc(C.override)}" inputmode="decimal" placeholder="${t.calc/100}"><button class="btn sm" data-act="ovrClear">Use calculated</button></div>
  ${t.err?`<p class="hint" style="color:var(--red)">${esc(t.err)}</p>`:''}<p class="hint">Cannot go above the MRP total (${rs(t.gross)}).${capOn()?` A cut deeper than the ${cap()}% limit asks for the pharmacist PIN.`:''}</p></div>
  <div class="tot" style="background:var(--pri2);border-radius:8px;padding:6px 8px;margin:4px 0"><b class="money-in">Net savings on this bill</b><b class="money-in">${rs(Math.max(0,t.gross-t.total))}</b></div>
- ${walk?'':`<div class="tot"><span>Old pending on khata</span><span class="${pend>0?'due':''}">${rs(pend)}</span></div>`}
+ ${walk?'':`<div class="tot"><span>Previous due</span><span class="${pend>0?'due':''}">${rs(pend)}</span></div>`}
  <label>Paid by</label><div class="seg" role="group" aria-label="Paid by">${['cash','upi','credit'].map(k=>`<button data-act="mode" data-v="${k}" class="${payMode()===k?'on':''}" ${walk&&k==='credit'?'disabled title="Walk-in sale cannot go on credit"':''} aria-pressed="${payMode()===k}">${k==='credit'?'Credit':MODE_TXT[k]}</button>`).join('')}</div>
  <div class="grid2"><div><label>${payMode()==='credit'?'Received now':'Received now (₹)'}</label><input id="paid" value="${payMode()==='credit'?'':esc(C.paid)}" placeholder="${payMode()==='credit'?'Nothing · on khata':'Full '+rs(t.total).replace('₹','₹ ')}" inputmode="decimal" ${payMode()==='credit'?'disabled':''}></div>
  <div><label>Bill date</label><input type="date" id="bdate" value="${C.date}" max="${today()}"></div></div>
@@ -371,7 +371,7 @@ function renderCart(){const el=$('#c-cart');if(!el)return;if(!C.cid){el.innerHTM
 function newBalHtml(){const t=finalCalc();if(t.err)return`<div class="hint" style="color:var(--red)">${esc(t.err)}</div>`;const walk=C.cid==='walkin';const paid=paidNow(t.total);
  if(isNaN(paid))return'<div class="hint" style="color:var(--red)">Received amount is not a number.</div>';
  if(walk){return paid>=t.total?`<div class="tot big"><span>Return change</span><span>${rs(paid-t.total)}</span></div>`:`<div class="hint" style="color:var(--red)">Walk-in sale must be paid in full (${rs(t.total)}). Pick a client to give on credit.</div>`}
- const after=pendingNow()+t.total-paid;return`<div class="tot big"><span>Khata after this bill</span><span class="${after>0?'due':after<0?'adv':''}">${after<0?rs(-after)+' advance':rs(after)}</span></div>`}
+ const pend=pendingNow();const after=pend+t.total-paid;return`<div class="tot"><span>This bill</span><span>${rs(t.total)}${paid?` &#8722; received ${rs(paid)}`:''}</span></div><div class="tot big"><span>Total due now</span><span class="${after>0?'due':after<0?'adv':''}">${after<0?rs(-after)+' advance':rs(after)}</span></div>`}
 function fillToday(){const el=$('#c-today');if(!el)return;const T=today();const list=S.bills.filter(b=>dstr(new Date(b.createdAt))===T||b.date===T).sort((a,b)=>b.createdAt-a.createdAt);
  const sum=list.filter(b=>!b.voided).reduce((s,b)=>s+b.total,0);const got=S.payments.filter(p=>!p.voided&&(p.date===T)).reduce((s,p)=>s+p.amount,0);
  el.innerHTML=`<h2>Today at the counter</h2><div class="tot"><span>${list.filter(b=>!b.voided).length} bill${list.filter(b=>!b.voided).length===1?'':'s'} · ${rs(sum)}</span><span class="money-in">Received ${rs(got)}</span></div><div class="mute" style="margin-bottom:6px">${(()=>{const pt=S.payments.filter(p=>!p.voided&&p.date===T);const by=k=>pt.filter(p=>p.mode===k).reduce((s,p)=>s+p.amount,0);const cr=list.filter(b=>!b.voided&&b.clientId&&b.date===T).reduce((s,b)=>{const lp=linkedPay(b.id);return s+b.total-(lp?lp.amount:0)},0);return`Cash ${rs(by('cash'))} · UPI ${rs(by('upi'))} · Credit ${rs(cr)}`})()}</div><div class="list">${list.slice(0,15).map(b=>{const c=client(b.clientId);return`<div class="it ${b.voided?'void':''}" data-act="openBill" data-id="${b.id}"><div><b>#${b.no}</b> ${esc(c?c.name:'Walk-in')}<div class="mute">${b.date!==T?'dated '+fdate(b.date)+' · ':''}${b.items.length} item${b.items.length>1?'s':''}</div></div><div class="r">${rs(b.total)}<div class="mute">${(()=>{const lp=linkedPay(b.id);return !lp?'Credit':lp.amount<b.total?MODE_TXT[lp.mode]+' + credit':MODE_TXT[lp.mode]})()}</div></div></div>`}).join('')||'<div class="empty">No bills yet today.</div>'}</div>`}
@@ -438,7 +438,7 @@ function clientForm(c,from){const isNew=!c;c=c||{name:'',phone:'',address:'',ope
  <label>Phone (10 digits)</label><input id="f-phone" value="${esc(c.phone)}" inputmode="tel" autocomplete="off">
  <label>Address</label><input id="f-addr" value="${esc(c.address)}">
  <div class="grid2"><div><label>Opening balance (₹)</label><input id="f-ob" value="${c.openingBal?c.openingBal/100:''}" placeholder="0" inputmode="decimal"></div><div><label>As on date</label><input type="date" id="f-od" value="${c.openingDate||today()}" max="${today()}"></div></div>
- <p class="hint">Copy the balance from the paper book as on this date. Do not also enter the old bills before this date, or they will count twice. Use a minus sign for advance.</p>
+ <p class="hint">Only for dues carried from a paper khata before you start here. Leave 0 for a new client &#8212; credit bills and payments then build the balance. Do not also enter old bills from before this date, or they count twice. Use a minus for advance.</p>
  <div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="f-save">Save client</button></div>`);
  $('#f-save',ov).onclick=async()=>{const name=$('#f-name',ov).value.trim();const phone=normPhone($('#f-phone',ov).value);const ob=$('#f-ob',ov).value.trim()===''?0:toP($('#f-ob',ov).value);const od=$('#f-od',ov).value||today();
   if(!name)return toast('Name is needed');if(phone&&phone.length!==10)return toast('Phone should be 10 digits');if(isNaN(ob))return toast('Opening balance is not a number');if(od>today())return toast('Date cannot be in the future');
@@ -490,7 +490,7 @@ function billModal(id){const b=bill(id);if(!b)return;const c=client(b.clientId);
  ${b.adjust?`<div class="tot"><span>Changed by pharmacist${b.adjNote?' · '+esc(b.adjNote):''}</span><span>${b.adjust>0?'+':''}${rs(b.adjust)}</span></div>`:''}<div class="tot big"><span>Bill total</span><span>${rs(b.total)}</span></div><div class="tot" style="background:var(--pri2);border-radius:8px;padding:6px 8px;margin:4px 0"><b class="money-in">Net savings on this bill after applied discounts</b><b class="money-in">${rs(Math.max(0,savedOn(b)))}</b></div>
  <div class="tot"><span>Paid by</span><span class="${lp?'money-in':'due'}">${lp?rs(lp.amount)+' · '+MODE_TXT[lp.mode]+(lp.amount<b.total?` · ${rs(b.total-lp.amount)} on credit`:''):(b.clientId?'Credit · all on khata':'—')}</span></div>
  ${rets.length?`<div class="tot"><span>Returned</span><span class="money-in">−${rs(rets.reduce((s,r)=>s+r.total,0))}</span></div><div class="mute">${rets.map(r=>fdate(r.date)+': '+r.items.map(i=>esc(i.name)+' '+i.tablets+' '+pl(i.unit||'tablet',i.tablets)).join(', ')).join('<br>')}</div>`:''}
- ${pos?`<div class="tot"><span>Khata after this bill</span><span>${rs(pos.after)}</span></div>`:''}
+ ${pos?`<div class="tot"><span>Due right after this bill</span><span>${rs(pos.after)}</span></div><div class="tot"><span>Total due now</span><span class="${pos.now>0?'due':''}">${rs(pos.now)}</span></div>`:''}
  <div class="acts"><button class="btn wa" data-act="shareBill" data-id="${b.id}">Send itemized PDF</button>${b.voided?'':`<button class="btn" data-act="amtBill" data-id="${b.id}">✎ Change amount</button><button class="btn" data-act="editBill" data-id="${b.id}">Edit items</button><button class="btn" data-act="returnBill" data-id="${b.id}">Return packs</button><button class="btn red" data-act="voidBill" data-id="${b.id}">Void</button>`}</div>
  ${b.voided?'':'<p class="hint">Change amount, edit, return and void need the pharmacist PIN.</p>'}`)}
 async function editBill(id){const b=bill(id);if(billReturns(id).length)return toast('This bill has a return on it. Make another return or void the bill instead.',4000);
@@ -545,10 +545,11 @@ async function amtBill(id){const b=bill(id);if(!(await askPin(`Change the amount
 function monthBill(cid,m){const c=client(cid);m=m||(new Date().getDate()<=10?shiftYM(thisYM(),-1):thisYM());const s=statement(cid,m);
  const ov=modal('Month bill',`<p><b>${esc(c.name)}</b></p><label>Month</label><input type="month" id="mb-m" value="${m}" max="${thisYM()}">
  <div class="card" style="margin-top:12px"><div class="tot"><span>Brought forward (till ${fdate(addDays(s.start,-1))})</span><span>${rs(s.bf)}</span></div>
+ <p class="hint mute" style="margin:4px 0 8px">Payments in a later month show in that month, not here. Current pending is on the client card.</p>
  ${s.open?`<div class="tot"><span>Opening balance entered</span><span>${rs(s.open)}</span></div>`:''}
  <div class="tot"><span>+ Medicines this month</span><span>${rs(s.meds)}</span></div>${s.rets?`<div class="tot"><span>− Returns</span><span>${rs(s.rets)}</span></div>`:''}
  <div class="tot"><span>− Money received</span><span class="money-in">${rs(s.paid)}</span></div>
- <div class="tot big"><span>Closing due</span><span class="${s.closing>0?'due':'adv'}">${s.closing<0?rs(-s.closing)+' advance':rs(s.closing)}</span></div>
+ <div class="tot big"><span>Closing due (end of this month)</span><span class="${s.closing>0?'due':'adv'}">${s.closing<0?rs(-s.closing)+' advance':rs(s.closing)}</span></div>
  <p class="hint">This closing is ${mName(shiftYM(m,1))}’s opening automatically. Nothing is typed twice.</p></div>
  <label style="display:flex;gap:10px;align-items:center;color:var(--ink);font-size:15px"><input type="checkbox" id="mb-items" checked> Itemized: every medicine with its quantity and discount</label>
  <table class="t" id="mb-table"><tbody>${s.rows.map(e=>{const b=e.kind==='bill'?bill(e.ref):null;return`<tr><td class="nw">${sdate(e.date)}</td><td>${esc(e.text)}</td><td class="r ${e.amt<0?'money-in':''}"><b>${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}</b></td></tr>`+(b?b.items.map(it=>`<tr class="mb-it"><td></td><td class="mute">${esc(it.name)} · ${qtyText(it)}${it.disc?` · <span class="money-in">${it.disc}% off</span>`:''}</td><td class="r mute">${rs(it.net)}</td></tr>`).join('')+(b.adjust?`<tr class="mb-it"><td></td><td class="mute">Adjusted${b.adjNote?': '+esc(b.adjNote):''}</td><td class="r mute">${b.adjust>0?'+':''}${rs(b.adjust)}</td></tr>`:''):'')}).join('')||'<tr><td class="empty">No entries this month.</td></tr>'}</tbody></table>
@@ -715,6 +716,7 @@ function readLogo(file){const fr=new FileReader();fr.onload=()=>{const img=new I
 /* =================== BACKUP / CSV =================== */
 function download(name,content,type){const b=content instanceof Blob?content:new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
 const fileTag=()=>(S.settings.name||'practice').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+today();
+
 async function backupJson(){const data={};for(const s of STORES)data[s]=s==='settings'?[S.settings]:S[s];const st={...S.settings,lastBackup:Date.now()};data.settings=[st];
  download(`counter-khata-${fileTag()}.json`,JSON.stringify({app:'counter-khata',version:1,exportedAt:new Date().toISOString(),data}),'application/json');
  await commit([{store:'settings',value:st}]);toast('Backup downloaded. Keep it somewhere safe.');render()}
