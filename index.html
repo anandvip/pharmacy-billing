@@ -679,7 +679,7 @@ function vShop(){const s=S.settings;const counts=['clients','bills','payments','
  <div class="acts"><button class="btn pri" data-act="saveShop">Save shop details</button></div></div>
  <div class="card"><h2>Locked by PIN</h2><div class="tot"><span>Discount limit</span><b>${capOn()?cap()+'%':'No limit (unlocked)'}</b></div><div class="acts"><button class="btn" data-act="changeCap">${capOn()?'Change or remove limit':'Set a limit'}</button><button class="btn" data-act="changePin">Change PIN</button></div>${s.name?'':'<p class="hint">Sample PIN is 2580. Change it before real use.</p>'}</div>
  <div class="card"><h2>Backup</h2><p class="mute">Last backup: <b>${s.lastBackup?fdate(dstr(new Date(s.lastBackup))):'never'}</b>. Send the file to yourself on WhatsApp or Drive once a week.</p>
- <div class="acts"><button class="btn pri" data-act="backupJson">Download full backup</button><button class="btn" data-act="restoreJson">Restore a backup</button></div></div>
+ <div class="acts"><button class="btn pri" data-act="backupJson">Download full backup</button><button class="btn" data-act="restoreJson">Restore a backup</button><button class="btn red" data-act="resetApp">Reset app / start fresh</button></div></div>
  <div class="card"><h2>Excel (CSV)</h2><p class="mute">Opens in Excel or Google Sheets.</p><div class="acts"><button class="btn sm" data-act="csvLedger">Khata entries</button><button class="btn sm" data-act="csvBills">All bills with items</button><button class="btn sm" data-act="csvClients">Clients + balance</button><button class="btn sm" data-act="csvStock">Stock</button></div>
  <h2 style="margin-top:14px">Import from Excel</h2><p class="mute">Type the paper book into a sheet once, save as CSV, import here. Download a template to see the columns.</p>
  <div class="acts"><button class="btn sm" data-act="impClients">Import clients</button><button class="btn sm" data-act="tplClients">Clients template</button><button class="btn sm" data-act="impStock">Import stock</button><button class="btn sm" data-act="tplStock">Stock template</button></div></div>
@@ -716,6 +716,43 @@ function readLogo(file){const fr=new FileReader();fr.onload=()=>{const img=new I
 /* =================== BACKUP / CSV =================== */
 function download(name,content,type){const b=content instanceof Blob?content:new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
 const fileTag=()=>(S.settings.name||'practice').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+today();
+
+let resetBackupDone=false;
+function resetApp(){
+ resetBackupDone=false;
+ const ov=modal('Reset app / start fresh',`<p><b>Everything on this device will be erased</b> &#8212; clients, stock, bills, payments, returns, prescriptions, and shop details.</p>
+ <p class="hint">You can bring a backup back later from <b>Shop &#8594; Backup &#8594; Restore a backup</b>.</p>
+ <div class="acts" style="flex-direction:column;align-items:stretch;gap:8px">
+  <button class="btn pri" id="rst-bak">Download backup first</button>
+  <label style="display:flex;gap:8px;align-items:flex-start;font-size:14px"><input type="checkbox" id="rst-skip"> <span>I understand, erase without backup</span></label>
+  <button class="btn red" id="rst-go" disabled>Erase everything</button>
+  <button class="btn" data-close>Cancel</button>
+ </div>`);
+ const go=$('#rst-go',ov), skip=$('#rst-skip',ov);
+ const sync=()=>{go.disabled=!(resetBackupDone||skip.checked)};
+ skip.onchange=sync;
+ $('#rst-bak',ov).onclick=async()=>{await backupJson();resetBackupDone=true;sync();toast('Backup downloaded. You can erase when ready.')};
+ go.onclick=async()=>{
+  if(!(resetBackupDone||skip.checked))return;
+  if(!(await askPin('PIN required to erase everything on this device.')))return;
+  if(!(await confirmBox('Erase <b>all</b> books on this phone? This cannot be undone.','Erase everything',true)))return;
+  closeModal(ov);
+  await eraseAllLocal();
+ };
+}
+async function eraseAllLocal(){
+ try{
+  const ops=[];
+  for(const store of STORES)ops.push({store,clear:true});
+  const pinHash=await hashPin('2580');
+  ops.push({store:'settings',value:{id:'shop',name:'',pharmacist:'',phone:'',counter:'',address:'',letterhead:'',logo:'',discCap:0,v2:true,pinHash,billSeq:0,lowStrips:2,lastBackup:null}});
+  await commit(ops);
+ }catch(e){
+  try{db&&db.close()}catch(_){}
+  await new Promise((res)=>{const r=indexedDB.deleteDatabase('counter-khata');r.onsuccess=()=>res();r.onerror=()=>res();r.onblocked=()=>res()});
+ }
+ location.reload();
+}
 
 async function backupJson(){const data={};for(const s of STORES)data[s]=s==='settings'?[S.settings]:S[s];const st={...S.settings,lastBackup:Date.now()};data.settings=[st];
  download(`counter-khata-${fileTag()}.json`,JSON.stringify({app:'counter-khata',version:1,exportedAt:new Date().toISOString(),data}),'application/json');
@@ -928,6 +965,7 @@ const ACT={
  changeCap:async()=>{if(!(await askPin('Change the discount cap')))return;const ov=modal('Discount cap',`<label>Highest discount allowed at the counter (%)</label><input id="cap-in" value="${capOn()?cap():''}" placeholder="blank or 0 = no limit" inputmode="decimal"><p class="hint">Leave blank for no limit. With a limit, deeper discounts ask for the PIN.</p><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="cap-ok">Save</button></div>`);$('#cap-ok',ov).onclick=async()=>{const v=num($('#cap-in',ov).value);if(v<0||v>100)return toast('Enter 0 to 100');await commit([{store:'settings',value:{...S.settings,discCap:v}}]);closeModal(ov);toast(v>0&&v<100?`Discount limit set to ${v}%`:'Discount unlocked: no limit');render()}},
  changePin:async()=>{if(!(await askPin('Enter the current PIN first')))return;const ov=modal('New PIN',`<label>New PIN (4 to 8 digits)</label><input id="np1" type="password" inputmode="numeric" maxlength="8"><label>Type it again</label><input id="np2" type="password" inputmode="numeric" maxlength="8"><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="np-ok">Save PIN</button></div>`);$('#np-ok',ov).onclick=async()=>{const a=$('#np1',ov).value.trim(),b=$('#np2',ov).value.trim();if(!/^\d{4,8}$/.test(a))return toast('Use 4 to 8 digits');if(a!==b)return toast('The two PINs do not match');await commit([{store:'settings',value:{...S.settings,pinHash:await hashPin(a)}}]);pinUntil=0;closeModal(ov);toast('PIN changed. Do not forget it.');render()}},
  backupJson:()=>backupJson(),
+ resetApp:()=>resetApp(),
  restoreJson:()=>$('#f-restore').click(),
  impClients:()=>$('#f-clients').click(),
  impStock:()=>$('#f-stock').click(),
