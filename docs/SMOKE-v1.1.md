@@ -51,8 +51,17 @@ If anything looks wrong, Shop → **Backup** → **Restore a backup** with the f
 - [ ] Client card / khata **Pending** equals bill 2 only (not bill 1 + bill 2).
 - [ ] On the khata list, bill 1, then the payment, then bill 2, with running balance that does **not** jump to bill1+bill2 before the payment on the same day.
 - [ ] New bill screen shows **Previous due**, **This bill**, and **Total due now**.
-- [ ] Opening balance hint on New client says it is only for paper-book carry-in; leave 0 for a new client.
 - [ ] Month bill for an older month still shows that month’s closing; a payment in a later month appears in the later month (hint under Brought forward).
+
+## 6b. Previous balance from paper khata
+
+- [ ] New client form label is **Previous balance from paper khata (optional)** with **Client owes me** / **I owe client (advance)**.
+- [ ] Helper says leave blank or 0 for a new client; credit builds from bills automatically.
+- [ ] Add client with previous balance 500 → edit to **0** → pending becomes 0; no advance; no new payment row.
+- [ ] Edit to blank / tap **Remove previous balance** → Save → opening is 0.
+- [ ] Edit to 200 → pending 200.
+- [ ] If opening 500 was paid with Amount received (pending 0), editing opening to 0 shows a warning about advance; Cancel keeps opening 500 and pending 0.
+- [ ] Advance only appears when **I owe client (advance)** is chosen on purpose (or after confirming the warning).
 
 ## 7. Reset app / start fresh
 
