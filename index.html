@@ -13,7 +13,15 @@
 :root{--bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#6b736f;--line:#e3e1da;--pri:#0f6b4a;--pri2:#e7f3ed;--red:#b42318;--red2:#fdecea;--amb:#8a5a00;--amb2:#fff4d6;--rad:12px}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:84px}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:140px}
+.savebar{position:sticky;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,.12);margin:14px 0 8px}
+.savebar .net{flex:1;min-width:0}.savebar .net span{display:block;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}.savebar .net b{font-size:24px;color:var(--pri);line-height:1.15}
+.savebar .acts{margin:0;flex:0 0 auto}.savebar .acts .btn{flex:0 0 auto;min-width:0}
+.seg{display:flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px}
+.seg button{flex:1;border:0;background:var(--card);padding:9px 6px;font:inherit;font-weight:600;color:var(--mute);cursor:pointer}
+.seg button.on{background:var(--pri);color:#fff}
+.seg button+button{border-left:1px solid var(--line)}
+table.t.year td,table.t.year th{font-size:13px;padding:6px 4px}
 header.top{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px}
 header.top .t{flex:1;min-width:0}
 header.top b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -133,7 +141,7 @@ const STORES=['settings','clients','meds','bills','payments','returns','rx'];
 const S={settings:null,clients:[],meds:[],bills:[],payments:[],returns:[],rx:[]};
 let db, persisted=false, pinUntil=0, pendingLogo=null;
 const C={cid:null,cart:[],paid:'',mode:null,date:null,edit:null,override:'',ovrOpen:false};   // counter state
-const R={m:null};                                                        // reports state
+const R={m:null,mode:'month',y:null};                                   // reports: month | year | fy
 let view='counter', sub=null;
 
 /* ---------- small helpers ---------- */
@@ -152,6 +160,13 @@ const monthEnd=m=>{const[y,mo]=m.split('-').map(Number);return dstr(new Date(y,m
 const shiftYM=(m,k)=>{const[y,mo]=m.split('-').map(Number);const d=new Date(y,mo-1+k,1);return d.getFullYear()+'-'+pad(d.getMonth()+1)};
 const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const mName=m=>{const[y,mo]=m.split('-').map(Number);return MON[mo-1]+' '+y};
+const thisYear=()=>+today().slice(0,4);
+const fyStartYear=(d=today())=>{const[Y,M]=d.split('-').map(Number);return M>=4?Y:Y-1};
+const fyRange=y=>({y,start:y+'-04-01',end:(y+1)+'-03-31',label:'FY '+y+'-'+String(y+1).slice(2)});
+const yearRange=y=>({y,start:y+'-01-01',end:y+'-12-31',label:String(y)});
+const reportPeriod=()=>{if(R.mode==='fy'){const y=R.y!=null?R.y:fyStartYear();return fyRange(y)}
+ if(R.mode==='year'){const y=R.y!=null?R.y:thisYear();return yearRange(y)}
+ return null};
 const sdate=s=>{if(!s)return'';const[y,m,d]=s.split('-');return `${+d} ${MON[+m-1]} ’${y.slice(2)}`};
 const fdate=s=>{if(!s)return'';const[y,m,d]=s.split('-');return `${+d} ${MON[+m-1]} ${y}`};
 const rs=p=>{p=Math.round(p||0);const neg=p<0;p=Math.abs(p);return(neg?'−':'')+'₹'+(p/100).toLocaleString('en-IN',{minimumFractionDigits:p%100?2:0,maximumFractionDigits:2})};
@@ -242,6 +257,12 @@ function statement(cid,m){const start=m+'-01',end=monthEnd(m);let bf=0,open=0,me
  for(const e of ledger(cid)){if(e.date<start){bf+=e.amt;continue}if(e.date>end)continue;rows.push(e);
   if(e.kind==='open')open+=e.amt;else if(e.kind==='bill')meds+=e.amt;else if(e.kind==='ret')rets-=e.amt;else paid-=e.amt}
  return{bf,open,meds,rets,paid,closing:bf+open+meds-rets-paid,rows,start,end}}
+function rangeStatement(cid,start,end){let bf=0,open=0,meds=0,rets=0,paid=0;const rows=[];
+ for(const e of ledger(cid)){if(e.date<start){bf+=e.amt;continue}if(e.date>end)continue;rows.push(e);
+  if(e.kind==='open')open+=e.amt;else if(e.kind==='bill')meds+=e.amt;else if(e.kind==='ret')rets-=e.amt;else paid-=e.amt}
+ return{bf,open,meds,rets,paid,closing:bf+open+meds-rets-paid,rows,start,end}}
+function periodNums(start,end){const bills=S.bills.filter(b=>!b.voided&&b.date>=start&&b.date<=end);const billed=bills.reduce((s,b)=>s+b.total,0);
+ const rets=S.returns.filter(r=>!r.voided&&r.date>=start&&r.date<=end).reduce((s,r)=>s+r.total,0);const got=S.payments.filter(p=>!p.voided&&p.date>=start&&p.date<=end).reduce((s,p)=>s+p.amount,0);return{bills,billed,rets,got}}
 
 /* refill & stash: tablets bought ÷ dose per day, chained purchase after purchase */
 function coverage(r){const purchases=[];
@@ -288,7 +309,9 @@ function vCounter(){const eb=C.edit&&bill(C.edit);
 function fillCounter(){fillCClient();fillCAdd();renderCart();fillToday()}
 function fillCClient(){const el=$('#c-client');if(!el)return;
  if(!C.cid){
+  const recent=recentClients();
   el.innerHTML=`<h2>Who is buying?</h2><input id="cq" placeholder="Client name or phone" autocomplete="off" aria-label="Search client"><div id="cq-res" class="list"></div>
+  ${recent.length?`<div class="chips" aria-label="Recent clients">${recent.map(c=>`<button type="button" class="chip" data-act="pickClient" data-id="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
   <div class="acts"><button class="btn" data-act="walkin">Walk-in cash sale</button><button class="btn" data-act="newClient" data-from="counter">+ New client</button></div>
   <h2 style="margin-top:16px">Refills due (next 3 days)</h2><div class="list">${refillList()}</div>`;return}
  if(C.cid==='walkin'){el.innerHTML=`<div class="row"><div class="grow"><h3>Walk-in customer</h3><div class="mute">Cash sale, paid in full. Not added to any khata.</div></div><button class="btn sm" data-act="changeClient">Change</button></div>`;return}
@@ -304,6 +327,9 @@ function fillCClient(){const el=$('#c-client');if(!el)return;
 function refillList(){const rows=[];for(const r of S.rx){if(r.active===false)continue;const c=client(r.clientId),m=med(r.medId);if(!c||!m)continue;const cv=coverage(r);if(cv.due&&cv.ahead<=3)rows.push({r,c,m,cv})}
  rows.sort((a,b)=>a.cv.ahead-b.cv.ahead);
  return rows.length?rows.map(x=>`<div class="it" data-act="refill" data-id="${x.r.id}"><div><b>${esc(x.c.name)}</b><div class="mute">${esc(medLabel(x.m))} ×${int(x.r.usual)||1}</div></div><div class="r">${dueText(x.cv)}</div></div>`).join(''):'<div class="empty">Nothing due. Add prescriptions on a client’s khata to see refills here.</div>'}
+function recentClients(n=6){const seen=[];const have=new Set();
+ for(const b of [...S.bills].sort((a,b)=>b.createdAt-a.createdAt)){if(!b.clientId||b.voided||have.has(b.clientId))continue;const c=client(b.clientId);if(!c)continue;have.add(c.id);seen.push(c);if(seen.length>=n)break}
+ return seen}
 function lastBill(cid){return S.bills.filter(b=>b.clientId===cid&&!b.voided).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.createdAt-a.createdAt)[0]}
 function fillCAdd(){const el=$('#c-add');if(!el)return;if(!C.cid){el.innerHTML='';return}
  el.innerHTML=`<div class="card"><h2>Add medicine</h2><input id="mq" placeholder="Search stock by name or salt" autocomplete="off" aria-label="Search stock"><div id="mq-res" class="list"></div></div>`}
@@ -340,7 +366,7 @@ function renderCart(){const el=$('#c-cart');if(!el)return;if(!C.cid){el.innerHTM
  <div class="grid2"><div><label>${payMode()==='credit'?'Received now':'Received now (₹)'}</label><input id="paid" value="${payMode()==='credit'?'':esc(C.paid)}" placeholder="${payMode()==='credit'?'Nothing · on khata':'Full '+rs(t.total).replace('₹','₹ ')}" inputmode="decimal" ${payMode()==='credit'?'disabled':''}></div>
  <div><label>Bill date</label><input type="date" id="bdate" value="${C.date}" max="${today()}"></div></div>
  <div id="newbal">${newBalHtml()}</div>
- <div class="acts"><button class="btn pri" data-act="saveBill">${C.edit?'Save changes':'Save'}</button><button class="btn wa" data-act="saveBill" data-share="1">Save &#38; WhatsApp</button></div>
+ <div class="savebar" id="savebar"><div class="net"><span>Net total</span><b>${rs(t.total)}</b></div><div class="acts"><button class="btn pri" data-act="saveBill">${C.edit?'Save changes':'Save'}</button><button class="btn wa" data-act="saveBill" data-share="1">Save &#38; WhatsApp</button></div></div>
  ${walk?'':`<p class="hint">${payMode()==='credit'?'Credit: the whole bill goes on the khata.':'Cash/UPI: leave “Received now” blank if the full bill is paid, or type the part paid. The rest goes on the khata.'} The khata carries into next month and is never wiped at month end.</p>`}${C.date<today()?`<p class="hint">Old paper entry: this bill will count in <b>${mName(ymOf(C.date))}</b>.</p>`:''}</div>`}
 function newBalHtml(){const t=finalCalc();if(t.err)return`<div class="hint" style="color:var(--red)">${esc(t.err)}</div>`;const walk=C.cid==='walkin';const paid=paidNow(t.total);
  if(isNaN(paid))return'<div class="hint" style="color:var(--red)">Received amount is not a number.</div>';
@@ -526,10 +552,11 @@ function monthBill(cid,m){const c=client(cid);m=m||(new Date().getDate()<=10?shi
  <p class="hint">This closing is ${mName(shiftYM(m,1))}’s opening automatically. Nothing is typed twice.</p></div>
  <label style="display:flex;gap:10px;align-items:center;color:var(--ink);font-size:15px"><input type="checkbox" id="mb-items" checked> Itemized: every medicine with its quantity and discount</label>
  <table class="t" id="mb-table"><tbody>${s.rows.map(e=>{const b=e.kind==='bill'?bill(e.ref):null;return`<tr><td class="nw">${sdate(e.date)}</td><td>${esc(e.text)}</td><td class="r ${e.amt<0?'money-in':''}"><b>${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}</b></td></tr>`+(b?b.items.map(it=>`<tr class="mb-it"><td></td><td class="mute">${esc(it.name)} · ${qtyText(it)}${it.disc?` · <span class="money-in">${it.disc}% off</span>`:''}</td><td class="r mute">${rs(it.net)}</td></tr>`).join('')+(b.adjust?`<tr class="mb-it"><td></td><td class="mute">Adjusted${b.adjNote?': '+esc(b.adjNote):''}</td><td class="r mute">${b.adjust>0?'+':''}${rs(b.adjust)}</td></tr>`:''):'')}).join('')||'<tr><td class="empty">No entries this month.</td></tr>'}</tbody></table>
- <div class="acts"><button class="btn wa" id="mb-share">Send statement PDF</button></div><p class="hint">What you see here is exactly what the client receives.</p>`);
+ <div class="acts"><button class="btn wa" id="mb-share">Send statement PDF</button><button class="btn" id="mb-csv">Download CSV</button></div><p class="hint">What you see here is exactly what the client receives.</p>`);
  $('#mb-items',ov).onchange=e=>ov.querySelectorAll('.mb-it').forEach(r=>r.hidden=!e.target.checked);
  $('#mb-m',ov).onchange=e=>{if(!e.target.value)return;closeModal(ov);monthBill(cid,e.target.value)};
- $('#mb-share',ov).onclick=()=>shareStatement(cid,m,$('#mb-items',ov).checked)}
+ $('#mb-share',ov).onclick=()=>shareStatement(cid,m,$('#mb-items',ov).checked);
+ $('#mb-csv',ov).onclick=()=>csvMonthClient(cid,m)}
 
 /* =================== STOCK =================== */
 function vStock(){return`<div class="row" style="margin-bottom:8px"><input id="sq" class="grow" placeholder="Search name or salt" autocomplete="off" aria-label="Search stock"><button class="btn pri" data-act="medNew">+ Add medicine</button></div><p class="hint" style="margin:0 0 10px">Tap any value to change it. It saves when you tap away. Enter also saves, Esc cancels. Use ⋯ for received stock or to hide a medicine.</p><div id="st-res"></div>`}
@@ -607,14 +634,17 @@ function refreshCard(id){const card=document.querySelector(`[data-card="${id}"]`
 /* =================== REPORTS =================== */
 function monthNums(m){const st=m+'-01',en=monthEnd(m);const bills=S.bills.filter(b=>!b.voided&&b.date>=st&&b.date<=en);const billed=bills.reduce((s,b)=>s+b.total,0);
  const rets=S.returns.filter(r=>!r.voided&&r.date>=st&&r.date<=en).reduce((s,r)=>s+r.total,0);const got=S.payments.filter(p=>!p.voided&&p.date>=st&&p.date<=en).reduce((s,p)=>s+p.amount,0);return{bills,billed,rets,got}}
-function vReports(){const m=R.m||thisYM();const n=monthNums(m);const asOf=monthEnd(m)<today()?monthEnd(m):today();const bal=balances(asOf);let due=0,adv=0;for(const c of S.clients){const v=bal[c.id]||0;if(v>0)due+=v;else adv-=v}
+function vReports(){const mode=R.mode||'month';
+ const seg=`<div class="seg" role="tablist" aria-label="Report period"><button type="button" class="${mode==='month'?'on':''}" data-act="rmode" data-v="month">Month</button><button type="button" class="${mode==='year'?'on':''}" data-act="rmode" data-v="year">Year</button><button type="button" class="${mode==='fy'?'on':''}" data-act="rmode" data-v="fy">FY (Apr&#8211;Mar)</button></div>`;
+ if(mode!=='month')return seg+vReportsPeriod();
+ const m=R.m||thisYM();const n=monthNums(m);const asOf=monthEnd(m)<today()?monthEnd(m):today();const bal=balances(asOf);let due=0,adv=0;for(const c of S.clients){const v=bal[c.id]||0;if(v>0)due+=v;else adv-=v}
  const top={};for(const b of n.bills)for(const it of b.items){const k=it.medId;top[k]=top[k]||{name:it.name,unit:fm(it).unit,amt:0,tabs:0};top[k].amt+=it.net;top[k].tabs+=it.tablets}
  const topL=Object.values(top).sort((a,b)=>b.amt-a.amt).slice(0,5);
  const six=[];for(let i=5;i>=0;i--){const mm=shiftYM(m,-i);const x=monthNums(mm);six.push({m:mm,b:x.billed-x.rets,g:x.got})}const mx=Math.max(1,...six.map(x=>Math.max(x.b,x.g)));
  const low=S.meds.filter(x=>!x.archived&&x.stockTab<num(x.minStrips??S.settings.lowStrips)*x.tps);
  const exp=S.meds.filter(x=>!x.archived&&x.expiry&&x.expiry<=ymOf(addDays(today(),60)));
  const nowBal=balances();const topDue=S.clients.filter(c=>(nowBal[c.id]||0)>0).sort((a,b)=>nowBal[b.id]-nowBal[a.id]).slice(0,5);
- return`<div class="row" style="margin-bottom:10px"><button class="btn sm" data-act="rm" data-v="-1" aria-label="Previous month">‹</button><input type="month" id="rmonth" class="grow" value="${m}" max="${thisYM()}"><button class="btn sm" data-act="rm" data-v="1" aria-label="Next month" ${m>=thisYM()?'disabled':''}>›</button></div>
+ return seg+`<div class="row" style="margin-bottom:10px"><button class="btn sm" data-act="rm" data-v="-1" aria-label="Previous month">&#8249;</button><input type="month" id="rmonth" class="grow" value="${m}" max="${thisYM()}"><button class="btn sm" data-act="rm" data-v="1" aria-label="Next month" ${m>=thisYM()?'disabled':''}>&#8250;</button></div>
  <div class="kpis"><div class="kpi"><span class="mute">Billed${n.rets?' (after returns)':''}</span><b>${rs(n.billed-n.rets)}</b><span class="mute">given on credit ${rs(n.bills.filter(b=>b.clientId).reduce((t,b)=>{const lp=linkedPay(b.id);return t+b.total-(lp?lp.amount:0)},0))}</span></div><div class="kpi"><span class="mute">Collected</span><b class="money-in">${rs(n.got)}</b></div>
  <div class="kpi"><span class="mute">Still due on ${fdate(asOf)}</span><b class="due">${rs(due)}</b>${adv?`<span class="mute">advances ${rs(adv)}</span>`:''}</div><div class="kpi"><span class="mute">${n.bills.length} bills · average</span><b>${rs(n.bills.length?n.billed/n.bills.length:0)}</b></div></div>
  <div class="card"><h2>Six months</h2><div class="bars">${six.map(x=>`<div class="b"><div class="pair"><i style="height:${x.b/mx*100}%" title="Billed ${rs(x.b)}"></i><i class="c" style="height:${x.g/mx*100}%" title="Collected ${rs(x.g)}"></i></div>${MON[+x.m.slice(5)-1]}</div>`).join('')}</div><div class="legend"><span style="background:var(--pri)"></span>Billed<span style="background:#8cc9ad"></span>Collected</div></div>
@@ -622,8 +652,19 @@ function vReports(){const m=R.m||thisYM();const n=monthNums(m);const asOf=monthE
  <div class="card"><h2>Highest pending today</h2><div class="list">${topDue.map(c=>`<div class="it" data-act="openKhata" data-id="${c.id}"><div>${esc(c.name)}</div><div class="due">${rs(nowBal[c.id])}</div></div>`).join('')||'<div class="empty">Nobody owes anything.</div>'}</div></div>
  <div class="card"><h2>Low stock</h2><div class="list">${low.map(x=>medRow(x,'medEdit')).join('')||'<div class="empty">All good.</div>'}</div></div>
  ${exp.length?`<div class="card"><h2>Expiring within 60 days</h2><div class="list">${exp.map(x=>medRow(x,'medEdit')).join('')}</div></div>`:''}
- <div class="card"><h2>Excel</h2><div class="acts"><button class="btn" data-act="csvMonth">Month statements (all clients)</button><button class="btn" data-act="csvBills" data-m="${m}">This month’s bills</button></div></div>`}
-
+ <div class="card"><h2>Excel</h2><div class="acts"><button class="btn" data-act="csvMonth">Month statements (all clients)</button><button class="btn" data-act="csvBills" data-m="${m}">This month&#8217;s bills</button></div></div>`}
+function vReportsPeriod(){const p=reportPeriod();const y=p.y;const maxY=R.mode==='fy'?fyStartYear():thisYear();
+ const n=periodNums(p.start,p.end);const asOf=p.end<today()?p.end:today();const bal=balances(asOf);let due=0,adv=0;for(const c of S.clients){const v=bal[c.id]||0;if(v>0)due+=v;else adv-=v}
+ const rows=[...S.clients].sort((a,b)=>a.name.localeCompare(b.name)).map(c=>{const s=rangeStatement(c.id,p.start,p.end);return{c,s}}).filter(x=>x.s.rows.length||x.s.bf||x.s.open);
+ return`<div class="row" style="margin-bottom:10px"><button class="btn sm" data-act="ry" data-v="-1" aria-label="Previous">&#8249;</button><div class="grow" style="text-align:center;font-weight:700;padding:8px 0">${esc(p.label)}</div><button class="btn sm" data-act="ry" data-v="1" aria-label="Next" ${y>=maxY?'disabled':''}>&#8250;</button></div>
+ <div class="kpis"><div class="kpi"><span class="mute">Billed${n.rets?' (after returns)':''}</span><b>${rs(n.billed-n.rets)}</b></div><div class="kpi"><span class="mute">Collected</span><b class="money-in">${rs(n.got)}</b></div>
+ <div class="kpi"><span class="mute">Still due on ${fdate(asOf)}</span><b class="due">${rs(due)}</b>${adv?`<span class="mute">advances ${rs(adv)}</span>`:''}</div><div class="kpi"><span class="mute">${n.bills.length} bills</span><b>${rs(n.bills.length?n.billed/n.bills.length:0)}</b><span class="mute">average</span></div></div>
+ <div class="card"><h2>Per client · ${esc(p.label)}</h2>
+ ${rows.length?`<table class="t year"><thead><tr><th>Client</th><th class="r">Brought fwd</th><th class="r">Medicines</th><th class="r">Returns</th><th class="r">Received</th><th class="r">Closing</th><th></th></tr></thead><tbody>
+ ${rows.map(({c,s})=>`<tr><td>${esc(c.name)}<div class="mute">${esc(c.phone||'')}</div></td><td class="r">${rs(s.bf+s.open)}</td><td class="r">${rs(s.meds)}</td><td class="r">${rs(s.rets)}</td><td class="r money-in">${rs(s.paid)}</td><td class="r ${s.closing>0?'due':s.closing<0?'adv':''}">${s.closing<0?rs(-s.closing)+' adv':rs(s.closing)}</td><td class="r"><button class="btn sm" data-act="yearStmt" data-id="${c.id}">PDF</button></td></tr>`).join('')}
+ </tbody></table>`:'<div class="empty">No client activity in this period.</div>'}
+ <div class="acts"><button class="btn" data-act="csvPeriod">Download CSV</button></div>
+ <p class="hint">PDF uses the same layout as the month statement, for the whole ${R.mode==='fy'?'financial year':'calendar year'}.</p></div>`}
 /* =================== SHOP =================== */
 function vShop(){const s=S.settings;const counts=['clients','bills','payments','meds'].map(k=>`${S[k].length} ${k==='meds'?'medicines':k}`).join(' · ');
  return`<div class="card"><h2>Shop details</h2>
@@ -684,6 +725,10 @@ async function restoreJson(file){let j;try{j=JSON.parse(await file.text())}catch
  if(!(await confirmBox(`Replace all books on this phone with the backup from <b>${esc((j.exportedAt||'').slice(0,10))}</b> (${(d.clients||[]).length} clients, ${n} bills)? This cannot be undone.`,'Replace everything',true)))return;
  const ops=[];for(const s of STORES){ops.push({store:s,clear:true});for(const v of(d[s]||[]))if(v&&v.id)ops.push({store:s,value:v})}
  try{await commit(ops)}catch(e){return toast('Restore failed: '+e.message)}resetCounter();toast('Backup restored');go('counter')}
+function csvMonthClient(cid,m){const c=client(cid);const st=statement(cid,m);const rows=[['date','entry','debit','credit','balance']];rows.push(['','Brought forward (till '+addDays(st.start,-1)+')',st.bf>0?rupees(st.bf):'',st.bf<0?rupees(-st.bf):'',rupees(st.bf)]);
+ for(const e of st.rows)rows.push([e.date,e.text,e.amt>0?rupees(e.amt):'',e.amt<0?rupees(-e.amt):'',rupees(e.bal)]);
+ rows.push(['','Closing due',st.closing>0?rupees(st.closing):'',st.closing<0?rupees(-st.closing):'',rupees(st.closing)]);
+ download('month-bill-'+(c.name||'client').replace(/[^a-z0-9]+/gi,'-').toLowerCase()+'-'+m+'.csv',csv(rows),'text/csv')}
 function csv(rows){return'﻿'+rows.map(r=>r.map(v=>{v=v==null?'':String(v);return/[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(',')).join('\r\n')}
 function parseCSV(text){text=text.replace(/^﻿/,'');const rows=[];let row=[],f='',q=false;for(let i=0;i<text.length;i++){const ch=text[i];if(q){if(ch==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=ch}else if(ch==='"')q=true;else if(ch===','){row.push(f);f=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}else f+=ch}if(f!==''||row.length){row.push(f);rows.push(row)}return rows.filter(r=>r.some(x=>String(x).trim()!==''))}
 function csvObjects(text){const rows=parseCSV(text);if(rows.length<2)return[];const h=rows[0].map(x=>x.trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''));return rows.slice(1).map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]??'').trim()])))}
@@ -697,6 +742,7 @@ const ACTS_CSV={
  csvClients(){const bal=balances();const rows=[[...CSV_CLIENT_H,'balance_today']];for(const c of S.clients)rows.push([c.name,c.phone,c.address,rupees(c.openingBal),c.openingDate,rupees(bal[c.id]||0)]);download(`clients-${fileTag()}.csv`,csv(rows),'text/csv')},
  csvStock(){const rows=[CSV_STOCK_H];for(const m of S.meds)if(!m.archived)rows.push([m.name,m.strength,m.salt,m.kind||'allopathic',fm(m).form,fm(m).pack,fm(m).unit,m.tps,fm(m).loose?'yes':'no',rupees(m.mrp),m.disc,Math.floor(Math.max(0,m.stockTab)/m.tps),Math.max(0,m.stockTab)%m.tps,m.minStrips??'',m.expiry]);download(`stock-${fileTag()}.csv`,csv(rows),'text/csv')},
  csvMonth(){const m=R.m||thisYM();const rows=[['client','phone','month','brought_forward','medicines','returns','received','closing_due']];for(const c of [...S.clients].sort((a,b)=>a.name.localeCompare(b.name))){const s=statement(c.id,m);rows.push([c.name,c.phone,m,rupees(s.bf+s.open),rupees(s.meds),rupees(s.rets),rupees(s.paid),rupees(s.closing)])}download(`month-statements-${m}.csv`,csv(rows),'text/csv')},
+ csvPeriod(){const p=reportPeriod();if(!p)return;const rows=[['client','phone','period','from','to','brought_forward','medicines','returns','received','closing_due']];for(const c of [...S.clients].sort((a,b)=>a.name.localeCompare(b.name))){const s=rangeStatement(c.id,p.start,p.end);if(!(s.rows.length||s.bf||s.open))continue;rows.push([c.name,c.phone,p.label,p.start,p.end,rupees(s.bf+s.open),rupees(s.meds),rupees(s.rets),rupees(s.paid),rupees(s.closing)])}download(`period-${p.label.replace(/\s+/g,'-')}-${fileTag()}.csv`,csv(rows),'text/csv')},
  tplClients(){download('clients-template.csv',csv([CSV_CLIENT_H,['Ramesh Gupta','9812345678','Main Bazaar','1450',today()]]),'text/csv')},
  tplStock(){download('stock-template.csv',csv([CSV_STOCK_H,['Metformin SR','500 mg','Metformin','allopathic','tablet','strip','tablet','15','yes','38','10','20','0','4',shiftYM(thisYM(),12)],['Cough syrup','100 ml','Dextromethorphan','allopathic','syrup','bottle','ml','100','no','115','5','12','0','3',shiftYM(thisYM(),10)],['Ashwagandha','60 tab','Withania somnifera','ayurvedic','tablet','bottle','tablet','60','no','250','5','6','0','2','']]),'text/csv')}};
 async function importClients(file){const rows=csvObjects(await file.text());if(!rows.length)return toast('No rows found. First row must be the column names.');
@@ -765,24 +811,27 @@ function billDoc(id){const b=bill(id);const c=client(b.clientId);const pos=billP
  return{blocks,msg:L.join('\n'),fname:`bill-${b.no}-${b.date}`,phone:c?c.phone:'',title:`Bill ${b.no} - ${shopName()}`}}
 async function shareBill(id){const d=billDoc(id);preview(await drawDoc(d.blocks),d)}
 
-function statementDoc(cid,m,itemized=true){const c=client(cid);const s=statement(cid,m);
+function statementDoc(cid,m,itemized=true){return statementDocFrom(cid,statement(cid,m),(itemized?'Itemized statement · ':'Monthly statement · ')+mName(m),itemized)}
+function yearStatementDoc(cid,start,end,label,itemized=true){return statementDocFrom(cid,rangeStatement(cid,start,end),(itemized?'Itemized ':'')+label,itemized)}
+function statementDocFrom(cid,s,title,itemized=true){const c=client(cid);
  const SC=[[36,'left',130],[170,'left',330],[585,'right',120],[724,'right',130]];
  const mb=s.rows.filter(e=>e.kind==='bill').map(e=>bill(e.ref));const mrp=mb.reduce((t,b)=>t+b.gross,0);const saved=mb.reduce((t,b)=>t+savedOn(b),0);
- const rowBlocks=[];const rowText=[];
+const rowBlocks=[];const rowText=[];
  for(const e of s.rows){rowBlocks.push({t:'item',cols:SC,bold:e.kind==='bill',cells:[fdate(e.date),e.text,e.amt<0?'−'+rs(-e.amt):rs(e.amt),rs(e.bal)]});
   if(e.kind==='bill'){const first=rowBlocks.length-1;const b=bill(e.ref);rowText.push(`\n*${sdate(e.date)} · Bill #${b.no} · ${rs(b.total)}*`);
    if(itemized){b.items.forEach((it,i)=>{rowBlocks.push({t:'li',cells:[it.name,qtyText(it),it.disc?it.disc+'%':'—',rs(it.net)]});rowText.push('  '+itemLine(it,i))});
     if(b.roundOff){rowBlocks.push({t:'li',cells:['Round off','','',rs(b.roundOff)]});rowText.push(`  Round off: ${rs(b.roundOff)}`)}if(b.adjust){rowBlocks.push({t:'li',cells:[b.adjNote?'Adjusted: '+b.adjNote:'Adjusted by pharmacist','','',(b.adjust>0?'+':'')+rs(b.adjust)]});rowText.push(`  Adjusted: ${b.adjust>0?'+':''}${rs(b.adjust)}`)}}
    for(let q=first;q<rowBlocks.length-1;q++)rowBlocks[q].keep=true}
   else rowText.push(`${sdate(e.date)} · ${e.text} · ${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}`)}
- const blocks=[{t:'head'},{t:'hr'},{t:'kv',l:(itemized?'Itemized statement · ':'Monthly statement · ')+mName(m),r:fdate(today()),bold:true},{t:'kv',l:c.name,r:c.phone||''},{t:'hr'},
+ const blocks=[{t:'head'},{t:'hr'},{t:'kv',l:title,r:fdate(today()),bold:true},{t:'kv',l:c.name,r:c.phone||''},{t:'hr'},
   {t:'tot',wide:true,l:`Brought forward (till ${fdate(addDays(s.start,-1))})`,r:rs(s.bf)},{t:'gap'},
   {t:'th',cells:['Date','Detail','Amount','Balance'],cols:SC},...(itemized?[{t:'li',cells:['Medicine','Qty','Disc','Amount']}]:[]),...rowBlocks,
   {t:'hr'},...(s.open?[{t:'tot',l:'Opening balance',r:rs(s.open)}]:[]),...(mb.length?[{t:'tot',l:'Medicines at MRP',r:rs(mrp)},{t:'tot',l:'Discount given',r:'−'+rs(saved),col:'#0f6b4a'}]:[]),{t:'tot',l:'+ Medicines charged',r:rs(s.meds)},...(s.rets?[{t:'tot',l:'− Returns',r:rs(s.rets)}]:[]),{t:'tot',l:'− Received',r:rs(s.paid),col:'#0f6b4a'},
-  {t:'big',l:s.closing<0?'Advance':'Closing due',r:rs(Math.abs(s.closing)),col:s.closing>0?'#b42318':'#0f6b4a'},...(mb.length?[{t:'save',l:`Net savings in ${mName(m)} after applied discounts`,r:rs(Math.max(0,saved))}]:[]),{t:'gap'},{t:'small',s:`This closing becomes the opening for ${mName(shiftYM(m,1))}.`,c:true},{t:'text',s:thanksLine(),c:true,bold:true},{t:'gap'},{t:'small',s:`Counter Khata · ${CREDIT}`,c:true}];
- const msg=[`Namaste ${c.name} ji 🙏`,`*${shopName()}* — ${mName(m)} ${itemized?'itemized ':''}statement`,`Brought forward: ${rs(s.bf+s.open)}`,...rowText,'',`Medicines charged: ${rs(s.meds)}${saved>0?` (MRP ${rs(mrp)}, discount −${rs(saved)})`:''}`,...(s.rets?[`Returns: −${rs(s.rets)}`]:[]),`Received: −${rs(s.paid)}`,`*${s.closing<0?'Advance':'Closing due'}: ${rs(Math.abs(s.closing))}*`,...(mb.length?[`*Net savings in ${mName(m)} after applied discounts: ${rs(Math.max(0,saved))}*`]:[]),'',`${itemized?'Itemized ':''}statement PDF attached.`,thanksLine(),'',`_Counter Khata · ${CREDIT}_`].join('\n');
- return{blocks,msg,fname:`statement-${c.name.replace(/\W+/g,'-')}-${m}`,phone:c.phone,title:`${mName(m)} statement - ${c.name}`}}
+  {t:'big',l:s.closing<0?'Advance':'Closing due',r:rs(Math.abs(s.closing)),col:s.closing>0?'#b42318':'#0f6b4a'},...(mb.length?[{t:'save',l:`Net savings in ${title} after applied discounts`,r:rs(Math.max(0,saved))}]:[]),{t:'gap'},{t:'small',s:`This closing becomes the opening for ${mName(shiftYM(m,1))}.`,c:true},{t:'text',s:thanksLine(),c:true,bold:true},{t:'gap'},{t:'small',s:`Counter Khata · ${CREDIT}`,c:true}];
+ const msg=[`Namaste ${c.name} ji 🙏`,`*${shopName()}* — ${title} ${itemized?'itemized ':''}statement`,`Brought forward: ${rs(s.bf+s.open)}`,...rowText,'',`Medicines charged: ${rs(s.meds)}${saved>0?` (MRP ${rs(mrp)}, discount −${rs(saved)})`:''}`,...(s.rets?[`Returns: −${rs(s.rets)}`]:[]),`Received: −${rs(s.paid)}`,`*${s.closing<0?'Advance':'Closing due'}: ${rs(Math.abs(s.closing))}*`,...(mb.length?[`*Net savings in ${title} after applied discounts: ${rs(Math.max(0,saved))}*`]:[]),'',`${itemized?'Itemized ':''}statement PDF attached.`,thanksLine(),'',`_Counter Khata · ${CREDIT}_`].join('\n');
+ return{blocks,msg,fname:`statement-${(c.name||'client').replace(/\W+/g,'-')}-${s.start}_${s.end}`,phone:c.phone,title:`${title} - ${c.name}`}}
 async function shareStatement(cid,m,itemized=true){const d=statementDoc(cid,m,itemized);preview(await drawDoc(d.blocks),d)}
+async function shareYearStatement(cid,itemized=true){const p=reportPeriod();if(!p)return;const d=yearStatementDoc(cid,p.start,p.end,p.label,itemized);preview(await drawDoc(d.blocks),d)}
 
 /* ---------- tiny PDF writer: the bill picture becomes A4 pages (works offline, no library) ---------- */
 const blobBytes=b=>b.arrayBuffer?b.arrayBuffer().then(x=>new Uint8Array(x)):new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(new Uint8Array(r.result));r.onerror=()=>rej(r.error);r.readAsArrayBuffer(b)});
@@ -869,6 +918,9 @@ const ACT={
  medNew:()=>medForm(),
  medEdit:(el,id)=>medForm(med(id)),
  rm:el=>{R.m=shiftYM(R.m||thisYM(),+el.dataset.v);if(R.m>thisYM())R.m=thisYM();render()},
+ rmode:el=>{R.mode=el.dataset.v;if(R.mode==='year'&&R.y==null)R.y=thisYear();if(R.mode==='fy'&&R.y==null)R.y=fyStartYear();render()},
+ ry:el=>{const maxY=R.mode==='fy'?fyStartYear():thisYear();R.y=(R.y!=null?R.y:(R.mode==='fy'?fyStartYear():thisYear()))+(+el.dataset.v);if(R.y>maxY)R.y=maxY;if(R.y<2000)R.y=2000;render()},
+ yearStmt:(el,id)=>shareYearStatement(id,true),
  saveShop:()=>saveShop(),
  rmLogo:()=>{pendingLogo='';const p=$('#s-logo-prev');if(p)p.style.display='none';toast('Logo will be removed when you save')},
  changeCap:async()=>{if(!(await askPin('Change the discount cap')))return;const ov=modal('Discount cap',`<label>Highest discount allowed at the counter (%)</label><input id="cap-in" value="${capOn()?cap():''}" placeholder="blank or 0 = no limit" inputmode="decimal"><p class="hint">Leave blank for no limit. With a limit, deeper discounts ask for the PIN.</p><div class="acts"><button class="btn" data-close>Cancel</button><button class="btn pri" id="cap-ok">Save</button></div>`);$('#cap-ok',ov).onclick=async()=>{const v=num($('#cap-in',ov).value);if(v<0||v>100)return toast('Enter 0 to 100');await commit([{store:'settings',value:{...S.settings,discCap:v}}]);closeModal(ov);toast(v>0&&v<100?`Discount limit set to ${v}%`:'Discount unlocked: no limit');render()}},
