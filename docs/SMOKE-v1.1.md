@@ -87,6 +87,18 @@ If anything looks wrong, Shop → **Backup** → **Restore a backup** with the f
 - [ ] Practice banner / Clear practice data still behave as before if you use a clean browser.
 - [ ] Howto and Guide links from Help still open.
 
+
+
+## 9. Links and navigation
+
+- [ ] Bottom **❓ Help** opens `/howto/` from Counter, Clients, Stock, Reports and Shop (phone).
+- [ ] On Counter with medicines in the bill (Save bar visible), Help still opens — Save / Save & WhatsApp do **not** sit on top of Help.
+- [ ] With an unsaved bill in the cart, Help opens without a leave-site prompt (refresh / close tab may still warn).
+- [ ] howto: **Guide** and **← Back to app** work; in-page contents anchors scroll to the section.
+- [ ] guide: **Help & FAQ**, **← App** / **Open the app**, step anchors, and screenshots load.
+- [ ] Serve with and without a trailing slash on `/`, `/howto/`, `/guide/` — no 404 for the app help pages.
+- [ ] Automated: with Playwright installed, `python3 -m http.server 8765` then `BASE=http://127.0.0.1:8765 node tests/help-nav.mjs` prints **ALL PASS**.
+
 ## Sign-off
 
 | | |
