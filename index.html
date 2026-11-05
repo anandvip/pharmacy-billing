@@ -13,8 +13,8 @@
 :root{--bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#6b736f;--line:#e3e1da;--pri:#0f6b4a;--pri2:#e7f3ed;--red:#b42318;--red2:#fdecea;--amb:#8a5a00;--amb2:#fff4d6;--rad:12px}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:140px}
-.savebar{position:sticky;bottom:calc(58px + env(safe-area-inset-bottom,0px));z-index:5;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,.12);margin:14px 0 8px}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink);padding-bottom:168px}
+.savebar{position:fixed;left:12px;right:12px;margin:0 auto;max-width:736px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:30;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;box-shadow:0 -6px 20px rgba(0,0,0,.12)}
 .savebar .net{flex:1;min-width:0}.savebar .net span{display:block;font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.04em}.savebar .net b{font-size:24px;color:var(--pri);line-height:1.15}
 .savebar .acts{margin:0;flex:0 0 auto}.savebar .acts .btn{flex:0 0 auto;min-width:0}
 .seg{display:flex;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:10px}
@@ -27,7 +27,7 @@ header.top .t{flex:1;min-width:0}
 header.top b{display:block;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 header.top small{opacity:.85;font-size:12px}
 main{max-width:760px;margin:0 auto;padding:12px}
-nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:6;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:40;padding-bottom:env(safe-area-inset-bottom)}
 nav.tabs button,nav.tabs a{flex:1;border:0;background:none;padding:8px 2px 10px;font:inherit;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;gap:1px;cursor:pointer;text-decoration:none}
 nav.tabs .ic{font-size:19px;line-height:1.2}
 nav.tabs button.on{color:var(--pri);font-weight:700}
@@ -290,7 +290,7 @@ function go(v,s=null){view=v;sub=s;render();window.scrollTo(0,0)}
 function render(){
  $('#shopTitle').textContent=shopName()+(S.settings.name?'':' (practice)');
  $('#shopSub').textContent='Counter Khata'+(S.settings.counter?' · '+S.settings.counter:'');
- $('#tabs').innerHTML=TABS.map(([k,ic,l])=>`<button data-act="tab" data-v="${k}" class="${view===k?'on':''}" aria-current="${view===k?'page':'false'}"><span class="ic">${ic}</span>${l}</button>`).join('')+'<a href="howto/"><span class="ic">❓</span>Help</a>';
+ $('#tabs').innerHTML=TABS.map(([k,ic,l])=>`<button data-act="tab" data-v="${k}" class="${view===k?'on':''}" aria-current="${view===k?'page':'false'}"><span class="ic">${ic}</span>${l}</button>`).join('')+'<a href="/howto/" data-help="1"><span class="ic">❓</span>Help</a>';
  const m=$('#main');
  const html={counter:vCounter,clients:sub==='__hidden__'?vHiddenClients:sub?vKhata:vClients,stock:vStock,reports:vReports,shop:vShop}[view]();
  m.innerHTML=banners()+html+`<footer class="app-foot">Counter Khata · ${CREDIT}</footer>`;
@@ -1114,7 +1114,9 @@ document.addEventListener('change',e=>{const t=e.target;
  else if(t.id==='f-clients'&&t.files[0]){importClients(t.files[0]);t.value=''}
  else if(t.id==='f-stock'&&t.files[0]){importStock(t.files[0]);t.value=''}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.querySelector('.ov'))closeModal()});
-window.addEventListener('beforeunload',e=>{if(C.cart.length){e.preventDefault();e.returnValue=''}});
+let allowHelpNav=false;
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('a[data-help],a[href*="howto"]'))allowHelpNav=true},{capture:true});
+window.addEventListener('beforeunload',e=>{if(allowHelpNav){allowHelpNav=false;return}if(C.cart.length){e.preventDefault();e.returnValue=''}});
 
 /* =================== sample shop =================== */
 async function seed(){const T=today(),D=n=>addDays(T,n);const expM=n=>shiftYM(thisYM(),n);
