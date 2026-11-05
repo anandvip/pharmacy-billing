@@ -63,6 +63,17 @@ If anything looks wrong, Shop → **Backup** → **Restore a backup** with the f
 - [ ] If opening 500 was paid with Amount received (pending 0), editing opening to 0 shows a warning about advance; Cancel keeps opening 500 and pending 0.
 - [ ] Advance only appears when **I owe client (advance)** is chosen on purpose (or after confirming the warning).
 
+
+## 6c. Hide / unhide / delete client
+
+- [ ] Clients → open a client → **Hide client**. Client leaves the main list, search, recent chips and bill picker.
+- [ ] Reports month/year totals for sales are **unchanged** after hide (bills still count).
+- [ ] Clients → **Hidden clients** → **Unhide** brings them back to the main list.
+- [ ] **Delete client** only on a hidden client. With dues or advance, toast says settle first (right direction).
+- [ ] With balance exactly 0: disclaimer EN+HI, **Download this client's backup** (JSON+CSV), then red **Delete client** enables, PIN, records gone and report totals drop.
+- [ ] After delete, stock/shelf quantities are unchanged (no restock).
+- [ ] Client backup is for records only; full **Restore a backup** still replace-only.
+
 ## 7. Reset app / start fresh
 
 - [ ] Shop → Backup → **Reset app / start fresh**.
