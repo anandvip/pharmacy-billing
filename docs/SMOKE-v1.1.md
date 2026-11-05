@@ -11,7 +11,7 @@ Estimated time: 10–15 minutes. Use fictional clients if you practice on a spar
 3. Keep that JSON file somewhere safe (Files / Drive / WhatsApp to yourself).
 4. Only then open the `v1.1-footing` build (or a local copy of that branch).
 
-If anything looks wrong, Shop → **Restore a backup** with the file from step 2 (PIN required).
+If anything looks wrong, Shop → **Backup** → **Restore a backup** with the file from step 2 (PIN required).
 
 ## 1. Database safety
 
@@ -45,7 +45,24 @@ If anything looks wrong, Shop → **Restore a backup** with the file from step 2
 - [ ] Reports → **FY (Apr–Mar)**: label looks like `FY 2026-27`; table and CSV work the same way.
 - [ ] On a client row, tap **PDF**: annual/FY statement preview opens (same style as the month statement).
 
-## 6. Regression quick looks
+## 6. Khata balance (ledger order + labels)
+
+- [ ] New client with opening **0**. Credit bill 1 → **Amount received** equal to bill 1 → credit bill 2.
+- [ ] Client card / khata **Pending** equals bill 2 only (not bill 1 + bill 2).
+- [ ] On the khata list, bill 1, then the payment, then bill 2, with running balance that does **not** jump to bill1+bill2 before the payment on the same day.
+- [ ] New bill screen shows **Previous due**, **This bill**, and **Total due now**.
+- [ ] Opening balance hint on New client says it is only for paper-book carry-in; leave 0 for a new client.
+- [ ] Month bill for an older month still shows that month’s closing; a payment in a later month appears in the later month (hint under Brought forward).
+
+## 7. Reset app / start fresh
+
+- [ ] Shop → Backup → **Reset app / start fresh**.
+- [ ] Modal warns that everything on this device will be erased.
+- [ ] **Download backup first** works; **Erase everything** stays disabled until backup downloaded **or** “I understand, erase without backup” is ticked.
+- [ ] Erase asks for the PIN, then reloads to an empty shop (no old clients/bills).
+- [ ] Shop → Backup → **Restore a backup** brings the file back; `"version": 1` still holds.
+
+## 8. Regression quick looks
 
 - [ ] Practice banner / Clear practice data still behave as before if you use a clean browser.
 - [ ] Howto and Guide links from Help still open.
