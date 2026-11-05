@@ -179,6 +179,9 @@ const normPhone=s=>{let d=digits(s);if(d.length===12&&d.startsWith('91'))d=d.sli
 const waPhone=s=>{const d=normPhone(s);return d.length===10?'91'+d:''};
 
 const client=id=>S.clients.find(x=>x.id===id);
+const clientHidden=c=>!!(c&&c.hidden);
+const visibleClients=()=>S.clients.filter(c=>!clientHidden(c));
+const hiddenClients=()=>S.clients.filter(c=>clientHidden(c));
 const med=id=>S.meds.find(x=>x.id===id);
 const bill=id=>S.bills.find(x=>x.id===id);
 const billNo=id=>{const b=bill(id);return b?b.no:'?'};
@@ -289,10 +292,11 @@ function render(){
  $('#shopSub').textContent='Counter Khata'+(S.settings.counter?' · '+S.settings.counter:'');
  $('#tabs').innerHTML=TABS.map(([k,ic,l])=>`<button data-act="tab" data-v="${k}" class="${view===k?'on':''}" aria-current="${view===k?'page':'false'}"><span class="ic">${ic}</span>${l}</button>`).join('')+'<a href="howto/"><span class="ic">❓</span>Help</a>';
  const m=$('#main');
- const html={counter:vCounter,clients:sub?vKhata:vClients,stock:vStock,reports:vReports,shop:vShop}[view]();
+ const html={counter:vCounter,clients:sub==='__hidden__'?vHiddenClients:sub?vKhata:vClients,stock:vStock,reports:vReports,shop:vShop}[view]();
  m.innerHTML=banners()+html+`<footer class="app-foot">Counter Khata · ${CREDIT}</footer>`;
  if(view==='counter')fillCounter();
  if(view==='clients'&&!sub)fillClientList();
+ if(view==='clients'&&sub==='__hidden__')fillHiddenList();
  if(view==='stock')fillStock();
 }
 function banners(){let h='';
@@ -324,11 +328,11 @@ function fillCClient(){const el=$('#c-client');if(!el)return;
   <div class="r"><div class="mute">Pending khata</div><button class="btn link ${pend>0?'due':''}" data-act="openKhata" data-id="${c.id}">${rs(pend)} ›</button></div></div>
   <div class="chips">${rx.map(r=>{const m=med(r.medId);if(!m)return'';const cv=coverage(r);return`<button class="chip" data-act="addMed" data-id="${m.id}" data-n="${int(r.usual)||1}">+ ${esc(medLabel(m))} ×${int(r.usual)||1} ${cv.ahead<=3&&cv.due?'⏰':''}</button>`}).join('')}${extra.map(id=>`<button class="chip" data-act="addMed" data-id="${id}" data-n="1">+ ${esc(medLabel(med(id)))}</button>`).join('')}</div>
   <div class="acts">${last?`<button class="btn" data-act="repeatLast">Repeat last bill (${fdate(last.date)})</button>`:''}<button class="btn sm" data-act="changeClient">Change client</button></div>`}
-function refillList(){const rows=[];for(const r of S.rx){if(r.active===false)continue;const c=client(r.clientId),m=med(r.medId);if(!c||!m)continue;const cv=coverage(r);if(cv.due&&cv.ahead<=3)rows.push({r,c,m,cv})}
+function refillList(){const rows=[];for(const r of S.rx){if(r.active===false)continue;const c=client(r.clientId),m=med(r.medId);if(!c||clientHidden(c)||!m)continue;const cv=coverage(r);if(cv.due&&cv.ahead<=3)rows.push({r,c,m,cv})}
  rows.sort((a,b)=>a.cv.ahead-b.cv.ahead);
  return rows.length?rows.map(x=>`<div class="it" data-act="refill" data-id="${x.r.id}"><div><b>${esc(x.c.name)}</b><div class="mute">${esc(medLabel(x.m))} ×${int(x.r.usual)||1}</div></div><div class="r">${dueText(x.cv)}</div></div>`).join(''):'<div class="empty">Nothing due. Add prescriptions on a client’s khata to see refills here.</div>'}
 function recentClients(n=6){const seen=[];const have=new Set();
- for(const b of [...S.bills].sort((a,b)=>b.createdAt-a.createdAt)){if(!b.clientId||b.voided||have.has(b.clientId))continue;const c=client(b.clientId);if(!c)continue;have.add(c.id);seen.push(c);if(seen.length>=n)break}
+ for(const b of [...S.bills].sort((a,b)=>b.createdAt-a.createdAt)){if(!b.clientId||b.voided||have.has(b.clientId))continue;const c=client(b.clientId);if(!c||clientHidden(c))continue;have.add(c.id);seen.push(c);if(seen.length>=n)break}
  return seen}
 function lastBill(cid){return S.bills.filter(b=>b.clientId===cid&&!b.voided).sort((a,b)=>a.date<b.date?1:a.date>b.date?-1:b.createdAt-a.createdAt)[0]}
 function fillCAdd(){const el=$('#c-add');if(!el)return;if(!C.cid){el.innerHTML='';return}
@@ -416,22 +420,107 @@ async function saveBill(share){
  if(share)shareBill(b.id)}
 
 /* =================== CLIENTS & KHATA =================== */
-function vClients(){const bal=balances();const tot=S.clients.reduce((s,c)=>s+Math.max(0,bal[c.id]||0),0);
+function vClients(){const bal=balances();const vis=visibleClients();const tot=vis.reduce((s,c)=>s+Math.max(0,bal[c.id]||0),0);const hid=hiddenClients().length;
  return`<div class="row" style="margin-bottom:8px"><input id="clq" class="grow" placeholder="Search name or phone" autocomplete="off" aria-label="Search clients"><button class="btn pri" data-act="newClient">+ New client</button></div>
- <p class="mute">${S.clients.length} clients · total pending <b class="due">${rs(tot)}</b></p><div class="card list" id="cl-res"></div>`}
+ <p class="mute">${vis.length} clients · total pending <b class="due">${rs(tot)}</b>${hid?` · <button class="btn link" data-act="hiddenClients">${hid} hidden</button>`:''}</p>
+ ${hid?`<div class="acts" style="margin:0 0 8px"><button class="btn sm" data-act="hiddenClients">Hidden clients</button></div>`:''}
+ <div class="card list" id="cl-res"></div>`}
 function fillClientList(q=''){const el=$('#cl-res');if(!el)return;const bal=balances();q=q.trim().toLowerCase();const qd=digits(q);
- const list=S.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>(bal[b.id]||0)-(bal[a.id]||0)||a.name.localeCompare(b.name));
+ const list=visibleClients().filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&digits(c.phone).includes(qd))).sort((a,b)=>(bal[b.id]||0)-(bal[a.id]||0)||a.name.localeCompare(b.name));
  el.innerHTML=list.map(c=>{const v=bal[c.id]||0;return`<div class="it" data-act="openKhata" data-id="${c.id}"><div><b>${esc(c.name)}</b><div class="mute">${esc(c.phone||'no phone')}</div></div><div class="r ${v>0?'due':v<0?'adv':'mute'}">${v<0?rs(-v)+' adv':rs(v)}</div></div>`}).join('')||'<div class="empty">No clients found.</div>'}
+function vHiddenClients(){const n=hiddenClients().length;
+ return`<button class="btn sm" data-act="tab" data-v="clients">&#8592; All clients</button>
+ <div class="card" style="margin-top:10px"><h2>Hidden clients</h2>
+ <p class="mute">Hidden clients stay out of lists and the bill picker. Their bills and payments still count in reports until you delete them.</p>
+ <div class="list" id="hid-res"></div>
+ ${n?'':'<div class="empty">No hidden clients.</div>'}</div>`}
+function fillHiddenList(){const el=$('#hid-res');if(!el)return;const bal=balances();
+ const list=hiddenClients().sort((a,b)=>a.name.localeCompare(b.name));
+ el.innerHTML=list.map(c=>{const v=bal[c.id]||0;return`<div class="it" style="cursor:default"><div class="grow" data-act="openKhata" data-id="${c.id}" style="cursor:pointer"><b>${esc(c.name)}</b><div class="mute">${esc(c.phone||'no phone')} · ${v<0?rs(-v)+' adv':rs(v)}</div></div>
+ <button class="btn sm" data-act="unhideClient" data-id="${c.id}">Unhide</button></div>`}).join('')||''}
 function vKhata(){const c=client(sub);if(!c){sub=null;return vClients()}
  const E=ledger(c.id);const bal=E.length?E[E.length-1].bal:0;
  const rx=S.rx.filter(r=>r.clientId===c.id).sort((a,b)=>(b.active!==false)-(a.active!==false));
- return`<button class="btn sm" data-act="tab" data-v="clients">← All clients</button>
- <div class="card" style="margin-top:10px"><div class="row"><div class="grow"><h3>${esc(c.name)}</h3><div class="mute">${c.phone?`<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`:'no phone'}${c.address?' · '+esc(c.address):''}</div></div>
+ const back=clientHidden(c)?`<button class="btn sm" data-act="hiddenClients">&#8592; Hidden clients</button>`:`<button class="btn sm" data-act="tab" data-v="clients">&#8592; All clients</button>`;
+ return`${back}
+ <div class="card" style="margin-top:10px"><div class="row"><div class="grow"><h3>${esc(c.name)}${clientHidden(c)?' <span class="badge">hidden</span>':''}</h3><div class="mute">${c.phone?`<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>`:'no phone'}${c.address?' · '+esc(c.address):''}</div></div>
  <div class="r"><div class="mute">${bal<0?'Advance':'Pending'}</div><div class="${bal>0?'due':'adv'}" style="font-size:22px">${rs(Math.abs(bal))}</div></div></div>
  <div class="acts"><button class="btn pri" data-act="billFor" data-id="${c.id}">New bill</button><button class="btn" data-act="payFor" data-id="${c.id}">Amount received</button><button class="btn" data-act="monthBill" data-id="${c.id}">Month bill</button></div>
- <div class="acts" style="margin-top:6px"><button class="btn sm" data-act="rxNew" data-id="${c.id}">+ Add prescription</button><button class="btn sm" data-act="editClient" data-id="${c.id}">Edit client</button></div></div>
+ <div class="acts" style="margin-top:6px"><button class="btn sm" data-act="rxNew" data-id="${c.id}">+ Add prescription</button><button class="btn sm" data-act="editClient" data-id="${c.id}">Edit client</button>
+ ${clientHidden(c)?`<button class="btn sm" data-act="unhideClient" data-id="${c.id}">Unhide client</button><button class="btn sm red" data-act="deleteClient" data-id="${c.id}">Delete client</button>`:`<button class="btn sm" data-act="hideClient" data-id="${c.id}">Hide client</button>`}</div>
+ ${clientHidden(c)?'<p class="hint">This client is hidden from lists and the bill picker. Reports still include their bills.</p>':''}</div>
  <div class="card"><h2>Repeat medicines</h2><div class="list">${rx.map(r=>{const m=med(r.medId);const cv=coverage(r);return`<div class="it" data-act="rxEdit" data-id="${r.id}"><div><b class="${r.active===false?'void':''}">${esc(m?medLabel(m):'(removed medicine)')}</b><div class="mute">${num(r.dose)} ${pl(fm(m).unit,num(r.dose))} a ${r.per||'day'} · usual ${int(r.usual)||1} ${pl(fm(m).pack,int(r.usual)||1)}${r.tps?' of '+r.tps:''}${r.disc!=null&&r.disc!==''?' · '+r.disc+'% off':''}${r.doctor?' · Dr '+esc(r.doctor):''}</div></div><div class="r">${r.active===false?'<span class="mute">stopped</span>':dueText(cv)}${cv.stash&&r.active!==false?`<div><span class="badge">stocking up · covered ${cv.ahead} days</span></div>`:''}</div></div>`}).join('')||'<div class="empty">No prescriptions yet.</div>'}</div></div>
  <div class="card"><h2>Khata · newest first</h2>${E.length?`<table class="t"><thead><tr><th>Date</th><th>Entry</th><th class="r">Amount</th><th class="r">Balance</th></tr></thead><tbody>${E.slice().reverse().map(e=>`<tr data-act="entry" data-kind="${e.kind}" data-id="${e.ref||c.id}"><td class="nw">${sdate(e.date)}</td><td>${esc(e.text)}</td><td class="r ${e.amt<0?'money-in':''}">${e.amt<0?'−'+rs(-e.amt):rs(e.amt)}</td><td class="r">${rs(e.bal)}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">Nothing on this khata yet.</div>'}</div>`}
+
+
+async function hideClient(id){const c=client(id);if(!c)return;
+ if(!(await confirmBox(`Hide <b>${esc(c.name)}</b> from lists and the bill picker? Their bills still count in reports. You can unhide them later.`,'Hide client')))return;
+ await commit([{store:'clients',value:{...c,hidden:true}}]);
+ if(C.cid===id){C.cid=null;C.cart=[];C.paid='';C.mode=null}
+ toast(c.name+' hidden');go('clients','__hidden__')}
+async function unhideClient(id){const c=client(id);if(!c)return;
+ await commit([{store:'clients',value:{...c,hidden:false}}]);toast(c.name+' is visible again');
+ if(view==='clients'&&sub==='__hidden__')go('clients','__hidden__');else if(view==='clients'&&sub===id)render();else go('clients',id)}
+
+function clientBundle(cid){const c=client(cid);if(!c)return null;
+ return{client:c,
+  bills:S.bills.filter(b=>b.clientId===cid),
+  payments:S.payments.filter(p=>p.clientId===cid),
+  returns:S.returns.filter(r=>r.clientId===cid),
+  rx:S.rx.filter(r=>r.clientId===cid)}}
+
+function downloadClientBackup(cid){const bun=clientBundle(cid);if(!bun)return false;
+ const c=bun.client;const tag=(c.name||'client').replace(/[^\w\-]+/g,'_').slice(0,40);
+ const payload={app:'counter-khata',version:1,kind:'client-export',exportedAt:new Date().toISOString(),
+  note:'Client-only export for your records. Shop Restore a backup needs a full shop backup and replaces everything — it will not merge this file.',
+  data:{clients:[c],bills:bun.bills,payments:bun.payments,returns:bun.returns,rx:bun.rx}};
+ download(`client-${tag}-${fileTag()}.json`,JSON.stringify(payload),'application/json');
+ const rows=[['type','date','ref','mode','amount_inr','note']];
+ for(const b of bun.bills)rows.push(['bill',b.date,'#'+(b.no||''),'',rupees(b.total),b.voided?'voided':'']);
+ for(const p of bun.payments)rows.push(['payment',p.date,p.billId?'with bill':'',p.mode||'',rupees(p.amount),p.voided?'voided':(p.note||'')]);
+ for(const r of bun.returns)rows.push(['return',r.date,r.billId||'','',rupees(r.total),r.voided?'voided':'']);
+ download(`client-${tag}-${fileTag()}.csv`,csv(rows),'text/csv');
+ return true}
+
+function deleteClientModal(id){const c=client(id);if(!c)return;
+ if(!clientHidden(c))return toast('Hide this client first, then delete from Hidden clients.');
+ const bal=balance(id);
+ if(bal!==0){
+  const msg=bal>0?`Settle ${rs(bal)} with this client first`:`Settle ${rs(-bal)} advance with this client first`;
+  return toast(msg);
+ }
+ let downloaded=false;
+ const en=`Deleting this client will change your total sales reports. All their bills, payments and returns will be removed from this app. You can hide this client for now and come back here later to confirm deletion. Before deleting, a backup of this client's bills and payments will be downloaded. Keep it for your accounting records. Delete is only allowed when the client owes nothing and has no advance. Please settle the account with your client first.`;
+ const hi=`इस क्लाइंट को हटाने से आपके कुल बिक्री रिपोर्ट बदल जाएँगे। उनके सभी बिल, भुगतान और रिटर्न इस ऐप से हटा दिए जाएँगे। आप अभी इस क्लाइंट को छिपा (Hide) सकते हैं और बाद में यहाँ आकर हटाने की पुष्टि कर सकते हैं। हटाने से पहले इस क्लाइंट के बिल और भुगतान का बैकअप डाउनलोड होगा। इसे अपने हिसाब-किताब के रिकॉर्ड के लिए रखें। हटाना तभी संभव है जब क्लाइंट पर कोई बकाया न हो और कोई एडवांस भी न हो। कृपया पहले क्लाइंट से हिसाब चुकता कर लें।`;
+ const ov=modal('Delete client',`<p><b>${esc(c.name)}</b></p>
+ <p>${esc(en)}</p>
+ <p lang="hi" style="line-height:1.55">${esc(hi)}</p>
+ <p class="hint">The download is for your records only. <b>Shop &#8594; Backup &#8594; Restore a backup</b> replaces the whole shop from a full backup; it will not merge this client file.</p>
+ <p class="hint">Medicines and shelf stock are not changed. Past sales already took stock off the shelf; delete does not put those packs back.</p>
+ <div class="acts" style="flex-direction:column;align-items:stretch;gap:8px">
+  <button class="btn pri" id="dc-bak">Download this client&#8217;s backup</button>
+  <button class="btn red" id="dc-go" disabled>Delete client</button>
+  <button class="btn" data-close>Cancel</button>
+ </div>`);
+ const goBtn=$('#dc-go',ov);
+ $('#dc-bak',ov).onclick=()=>{if(downloadClientBackup(id)){downloaded=true;goBtn.disabled=false;toast('Client backup downloaded. Keep it safe.')}};
+ goBtn.onclick=async()=>{
+  if(!downloaded)return;
+  if(!(await askPin('PIN required to delete this client and their sales.')))return;
+  if(!(await confirmBox(`Permanently delete <b>${esc(c.name)}</b> and all their bills, payments, returns and prescriptions? Sales reports will change. Stock will not be restocked.`,'Delete client',true)))return;
+  closeModal(ov);await deleteClientRecords(id);
+ }}
+
+async function deleteClientRecords(cid){const bun=clientBundle(cid);if(!bun)return;
+ const ops=[];
+ for(const b of bun.bills)ops.push({store:'bills',del:b.id});
+ for(const p of bun.payments)ops.push({store:'payments',del:p.id});
+ for(const r of bun.returns)ops.push({store:'returns',del:r.id});
+ for(const r of bun.rx)ops.push({store:'rx',del:r.id});
+ ops.push({store:'clients',del:cid});
+ try{await commit(ops)}catch(e){return toast('Could not delete: '+e.message)}
+ if(C.cid===cid){C.cid=null;C.cart=[];C.paid='';C.mode=null}
+ toast('Client deleted');go('clients','__hidden__')}
 
 function clientForm(c,from){const isNew=!c;c=c||{name:'',phone:'',address:'',openingBal:0,openingDate:today()};
  const ob0=c.openingBal||0;let obDir=ob0<0?'adv':'due';
@@ -668,7 +757,7 @@ function vReports(){const mode=R.mode||'month';
  const six=[];for(let i=5;i>=0;i--){const mm=shiftYM(m,-i);const x=monthNums(mm);six.push({m:mm,b:x.billed-x.rets,g:x.got})}const mx=Math.max(1,...six.map(x=>Math.max(x.b,x.g)));
  const low=S.meds.filter(x=>!x.archived&&x.stockTab<num(x.minStrips??S.settings.lowStrips)*x.tps);
  const exp=S.meds.filter(x=>!x.archived&&x.expiry&&x.expiry<=ymOf(addDays(today(),60)));
- const nowBal=balances();const topDue=S.clients.filter(c=>(nowBal[c.id]||0)>0).sort((a,b)=>nowBal[b.id]-nowBal[a.id]).slice(0,5);
+ const nowBal=balances();const topDue=visibleClients().filter(c=>(nowBal[c.id]||0)>0).sort((a,b)=>nowBal[b.id]-nowBal[a.id]).slice(0,5);
  return seg+`<div class="row" style="margin-bottom:10px"><button class="btn sm" data-act="rm" data-v="-1" aria-label="Previous month">&#8249;</button><input type="month" id="rmonth" class="grow" value="${m}" max="${thisYM()}"><button class="btn sm" data-act="rm" data-v="1" aria-label="Next month" ${m>=thisYM()?'disabled':''}>&#8250;</button></div>
  <div class="kpis"><div class="kpi"><span class="mute">Billed${n.rets?' (after returns)':''}</span><b>${rs(n.billed-n.rets)}</b><span class="mute">given on credit ${rs(n.bills.filter(b=>b.clientId).reduce((t,b)=>{const lp=linkedPay(b.id);return t+b.total-(lp?lp.amount:0)},0))}</span></div><div class="kpi"><span class="mute">Collected</span><b class="money-in">${rs(n.got)}</b></div>
  <div class="kpi"><span class="mute">Still due on ${fdate(asOf)}</span><b class="due">${rs(due)}</b>${adv?`<span class="mute">advances ${rs(adv)}</span>`:''}</div><div class="kpi"><span class="mute">${n.bills.length} bills · average</span><b>${rs(n.bills.length?n.billed/n.bills.length:0)}</b></div></div>
@@ -953,6 +1042,10 @@ const ACT={
  changeClient:()=>{if(C.edit)return toast('Cancel the edit first');C.cid=null;C.cart=[];C.paid='';C.mode=null;fillCounter()},
  newClient:el=>clientForm(null,el.dataset.from),
  editClient:(el,id)=>clientForm(client(id)),
+ hideClient:(el,id)=>hideClient(id),
+ unhideClient:(el,id)=>unhideClient(id),
+ deleteClient:(el,id)=>deleteClientModal(id),
+ hiddenClients:()=>go('clients','__hidden__'),
  pickClient:(el,id)=>{C.cid=id;C.mode=null;fillCounter();setTimeout(()=>{const q=$('#mq');if(q)q.focus()},50)},
  refill:(el,id)=>{const r=S.rx.find(x=>x.id===id);if(!r)return;if(C.cid!==r.clientId){C.cid=r.clientId;C.cart=[];C.paid=''}fillCounter();addToCart(r.medId,int(r.usual)||1)},
  addMed:(el,id)=>{addToCart(id,int(el.dataset.n)||1);const q=$('#mq');if(q&&el.closest('#mq-res')){q.value='';$('#mq-res').innerHTML=''}},
@@ -999,7 +1092,7 @@ document.addEventListener('click',e=>{const ie=e.target.closest('.ie');if(ie&&!e
 document.addEventListener('keydown',e=>{const ie=e.target.closest&&e.target.closest('.ie');if(ie&&e.target===ie&&(e.key==='Enter'||e.key===' ')){e.preventDefault();startIE(ie)}});
 document.addEventListener('click',async e=>{const el=e.target.closest('[data-act]');if(!el||el.disabled)return;const f=ACT[el.dataset.act];if(!f)return;e.preventDefault();try{await f(el,el.dataset.id,+el.dataset.i,e)}catch(err){console.error(err);toast('Something went wrong: '+err.message,5000)}});
 document.addEventListener('input',e=>{const t=e.target;
- if(t.id==='cq'){const q=t.value.trim().toLowerCase(),qd=digits(q);const res=$('#cq-res');if(!q){res.innerHTML='';return}const bal=balances();const list=S.clients.filter(c=>c.name.toLowerCase().includes(q)||(qd.length>=3&&digits(c.phone).includes(qd))).slice(0,8);
+ if(t.id==='cq'){const q=t.value.trim().toLowerCase(),qd=digits(q);const res=$('#cq-res');if(!q){res.innerHTML='';return}const bal=balances();const list=visibleClients().filter(c=>c.name.toLowerCase().includes(q)||(qd.length>=3&&digits(c.phone).includes(qd))).slice(0,8);
   res.innerHTML=list.map(c=>`<div class="it" data-act="pickClient" data-id="${c.id}"><div><b>${esc(c.name)}</b><div class="mute">${esc(c.phone||'')}</div></div><div class="r ${(bal[c.id]||0)>0?'due':'mute'}">${rs(bal[c.id]||0)}</div></div>`).join('')||`<div class="empty">No match. <button class="btn link" data-act="newClient" data-from="counter">Add as new client</button></div>`}
  else if(t.id==='mq'){$('#mq-res').innerHTML=searchMeds(t.value).map(m=>medRow(m)).join('')||(t.value.trim()?'<div class="empty">Not in stock list. Add it under Stock.</div>':'')}
  else if(t.id==='clq')fillClientList(t.value);
