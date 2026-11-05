@@ -14,26 +14,29 @@ It prints your shop details on every bill. Each client gets a neat, legible, ite
 
 ## Guide
 
-`guide/index.html` walks a new pharmacist through one full cycle: shop, practice vs real, PIN, stock, client, bill, WhatsApp, payments, returns, reports, backup, and the bottom bar. English/Hindi and light/dark toggles. Screenshots in `guide/img/` use fictional data only.
+`guide/index.html` walks a new pharmacist through one full cycle:
 
-## Branches and tags
+1. Create your business (Shop details)
+2. Practice mode vs real mode
+3. PIN and the discount limit
+4. Stock
+5. Clients
+6. Billing
+7. WhatsApp sharing
+8. Khata and payments
+9. Fixes and returns
+10. Reports
+11. Backup and Excel import/export
+12. The bottom bar
 
-| Ref | Meaning |
-|---|---|
-| `vipul` | **Live** GitHub Pages branch. Do not force-push or rewrite. |
-| `v1.0` | Tag for the November 2026 first cut (app + bilingual guide). |
-| `v1.1-footing` | Feature branch for v1.1 footing work. Not live until merged. |
+Each step says why the feature exists. It also has a phone screenshot with an English and Hindi caption.
 
-## v1.1 footing (on `v1.1-footing`)
+- English/Hindi toggle and light/dark toggle, both remembered in `localStorage`
+- Progress steps, table of contents, share links (WhatsApp, X, Facebook, LinkedIn, copy link)
+- SEO: canonical, Open Graph, Twitter tags and JSON-LD `HowTo`
+- Screenshots in `guide/img/` were taken in headless Chromium at a 390px phone width with **fictional data only**. Each is an SVG wrapping a WebP image, so they can be committed as text.
 
-Additive UI only. IndexedDB stays `counter-khata` version **1** with the same stores and fields. A `version:1` backup from v1.0 restores into v1.1.
-
-- Reports: Year and financial-year (Apr–Mar) views with a per-client table and CSV
-- Month bill: Download CSV for that client and month
-- Annual / FY statement PDF (same layout as the month statement)
-- Sticky Save bar with a prominent Net total; recent-client chips; bill PDF already shows a savings strip
-
-Before any merge to `vipul`, run `docs/SMOKE-v1.1.md` on a phone (backup first).
+When a button label changes in `index.html`, update `guide/` and `howto/` too.
 
 ## Conventions
 
