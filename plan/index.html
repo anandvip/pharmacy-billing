@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f6b4a">
+<meta name="robots" content="noindex">
+<title>Pharmacy app v2: the organised plan</title>
+<meta name="description" content="One plan for the next version of the app now called Counter Khata: first run, home, every flow, branding, and how the books stay safe.">
+<meta name="author" content="Vipul Anand">
+<style>
+:root{
+  --bg:#f6f5f1;--card:#fff;--ink:#1d2421;--mute:#5c655f;--line:#e3e1da;
+  --pri:#0f6b4a;--pri2:#e7f3ed;--pri-ink:#0b4a33;
+  --red:#b42318;--red2:#fdecea;--red-ink:#7a1810;
+  --amb:#8a5a00;--amb2:#fff4d6;--amb-ink:#5c4100;
+  --ok:#0f6b4a;--ok2:#e7f3ed;
+  --rad:12px;--max:820px;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bg:#121412;--card:#1b1e1c;--ink:#eceee9;--mute:#a3aaa5;--line:#2c322e;
+  --pri:#7dcaa8;--pri2:#163328;--pri-ink:#c8ebd9;
+  --red:#ff8a80;--red2:#3a1a18;--red-ink:#ffc9c4;
+  --amb:#f0c14b;--amb2:#3a2e12;--amb-ink:#ffe9a8;
+  --ok:#7dcaa8;--ok2:#163328;
+  color-scheme:dark;
+}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#121412;--card:#1b1e1c;--ink:#eceee9;--mute:#a3aaa5;--line:#2c322e;
+    --pri:#7dcaa8;--pri2:#163328;--pri-ink:#c8ebd9;
+    --red:#ff8a80;--red2:#3a1a18;--red-ink:#ffc9c4;
+    --amb:#f0c14b;--amb2:#3a2e12;--amb-ink:#ffe9a8;
+    --ok:#7dcaa8;--ok2:#163328;
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;background:var(--bg);color:var(--ink)}
+a{color:var(--pri)}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--pri);outline-offset:2px;border-radius:6px}
+header.top{position:sticky;top:0;z-index:5;background:var(--pri);color:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px}
+header.top .t{flex:1;min-width:0}
+header.top b{display:block;font-size:16px;line-height:1.2;white-space:nowrap}
+header.top small{opacity:.88;font-size:12px;white-space:nowrap;display:block}
+header.top a.back,header.top a.samples,header.top button.theme{
+  color:#fff;border:1px solid rgba(255,255,255,.55);border-radius:10px;padding:7px 10px;
+  text-decoration:none;font-weight:600;font-size:13px;white-space:nowrap;background:transparent;cursor:pointer;font-family:inherit
+}
+header.top button.theme{min-width:42px}
+main{max-width:var(--max);margin:0 auto;padding:14px 14px 48px}
+.draft{background:var(--amb2);color:var(--amb-ink);border:1px solid color-mix(in srgb,var(--amb) 35%,var(--line));border-radius:var(--rad);padding:10px 12px;margin:0 0 14px;font-size:14px}
+.draft b{font-weight:700}
+.lede{font-size:17px;margin:0 0 16px}
+h1{font-size:26px;line-height:1.25;margin:8px 0 8px}
+h2{font-size:20px;margin:28px 0 10px;color:var(--pri);scroll-margin-top:72px}
+h3{font-size:16px;margin:18px 0 8px;scroll-margin-top:72px}
+p{margin:8px 0}
+.mute{color:var(--mute);font-size:14px}
+nav.toc{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:14px 16px;margin:0 0 18px}
+nav.toc strong{display:block;margin-bottom:8px}
+nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:24px}
+@media(max-width:560px){nav.toc ol{columns:1}}
+nav.toc a{font-weight:600;text-decoration:none}
+nav.toc a:hover{text-decoration:underline}
+.props{display:grid;gap:8px;margin:12px 0}
+.prop{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:grid;grid-template-columns:minmax(110px,28%) 1fr;gap:8px;align-items:start}
+.prop .k{font-size:13px;color:var(--mute);font-weight:700}
+@media(max-width:640px){
+  .prop{grid-template-columns:1fr;gap:4px}
+  .pill{white-space:normal}
+}
+.wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:10px 0;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+.wrap.wide table{min-width:560px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;overflow-wrap:break-word}
+th{background:var(--pri2);color:var(--pri-ink);font-size:12px;letter-spacing:.02em;text-transform:uppercase}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:normal;line-height:1.5;max-width:100%}
+.pill.danger{background:var(--red2);color:var(--red-ink)}
+.pill.success{background:var(--ok2);color:var(--pri-ink)}
+.pill.warning{background:var(--amb2);color:var(--amb-ink)}
+.pill.neutral{background:var(--line);color:var(--ink)}
+.callout{background:var(--amb2);color:var(--amb-ink);border-left:4px solid var(--amb);border-radius:10px;padding:12px 14px;margin:12px 0}
+.callout .lead{font-weight:800;display:block;margin-bottom:4px}
+.steps{margin:8px 0;padding:0;list-style:none;counter-reset:st}
+.steps>li{position:relative;padding:8px 0 8px 42px;border-bottom:1px solid var(--line)}
+.steps>li:last-child{border-bottom:0}
+.steps>li:before{counter-increment:st;content:counter(st);position:absolute;left:0;top:10px;width:28px;height:28px;border-radius:50%;background:var(--pri2);color:var(--pri-ink);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center}
+.steps b{display:block}
+.homegrid{display:grid;grid-template-columns:1fr 1.2fr;gap:14px;align-items:start;margin:12px 0}
+@media(max-width:640px){.homegrid{grid-template-columns:1fr}}
+.phone{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:12px;max-width:280px;margin:0 auto;box-shadow:0 8px 24px color-mix(in srgb,var(--ink) 8%,transparent)}
+.phone .bar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.phone .logo{width:28px;height:28px;border-radius:8px;background:var(--pri);color:#fff;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.phone .shop{font-weight:700;font-size:13px;color:var(--pri);flex:1}
+.phone .dot{width:10px;height:10px;border-radius:50%;background:#2a9d5c;box-shadow:0 0 0 3px color-mix(in srgb,#2a9d5c 25%,transparent)}
+.exband{background:var(--amb2);color:var(--amb-ink);font-size:10px;font-weight:800;letter-spacing:.08em;text-align:center;padding:3px 6px;border-radius:6px;margin-bottom:8px}
+.summary{background:var(--pri2);color:var(--pri-ink);border-radius:12px;padding:10px;font-size:13px;margin-bottom:8px}
+.summary b{display:block;font-size:14px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.btns span{display:block;background:var(--pri);color:#fff;border-radius:10px;padding:14px 8px;text-align:center;font-weight:700;font-size:12px;line-height:1.25}
+.today{margin-top:8px;font-size:12px;color:var(--mute)}
+.today div{padding:6px 0;border-bottom:1px solid var(--line)}
+.map{background:var(--card);border:1px solid var(--line);border-radius:var(--rad);padding:12px 14px;margin:12px 0;overflow-x:auto}
+.map svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
+.map-list{margin:8px 0 0;padding-left:18px}
+.map-list ul{margin:4px 0;padding-left:18px}
+details{border:1px solid var(--line);border-radius:10px;padding:0 12px;margin:8px 0;background:var(--card)}
+details[open]{padding-bottom:10px}
+summary{cursor:pointer;font-weight:600;padding:11px 0}
+.eq{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0;text-align:center;font-size:16px}
+.frac{display:inline-block;vertical-align:middle;text-align:center;margin:0 4px}
+.frac .num,.frac .den{display:block;padding:0 6px}
+.frac .num{border-bottom:1px solid var(--ink)}
+.check{list-style:none;margin:8px 0;padding:0}
+.check li{padding:6px 0 6px 28px;position:relative;border-bottom:1px solid var(--line)}
+.check li:last-child{border-bottom:0}
+.check li:before{content:"";position:absolute;left:0;top:9px;width:16px;height:16px;border:2px solid var(--line);border-radius:4px;background:var(--card)}
+.decision{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin:12px 0;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.decision .ttl{font-weight:700}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+code{background:var(--pri2);color:var(--pri-ink);padding:1px 5px;border-radius:5px}
+pre{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+footer{margin-top:32px;padding-top:16px;border-top:1px solid var(--line);color:var(--mute);font-size:14px}
+footer a{font-weight:600}
+
+.map svg .bx{fill:var(--card);stroke:var(--mute);stroke-width:1.2}
+.map svg .bxt{fill:var(--pri);stroke:var(--pri)}
+.map svg .bxh{fill:var(--pri2);stroke:var(--pri);stroke-width:1.8}
+.map svg .tx{font:600 12px system-ui,-apple-system,sans-serif;fill:var(--ink);text-anchor:middle}
+.map svg .txw{fill:#fff}
+.map svg .ed{font:11px system-ui,-apple-system,sans-serif;fill:var(--mute);text-anchor:middle}
+.map svg .ln{stroke:var(--mute);stroke-width:1.4;fill:none;marker-end:url(#ar)}
+.map svg .ld{stroke:var(--mute);stroke-width:1.4;fill:none;stroke-dasharray:5 4;marker-end:url(#ar)}
+.map svg #ar path{fill:var(--mute)}
+@media print{
+  header.top{position:static}
+  header.top button.theme{display:none}
+  details{page-break-inside:avoid}
+  details:not([open]){border:0}
+  details:not([open]) summary{display:none}
+  details:not([open]){display:contents}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="back" href="/">App</a>
+  <div class="t">
+    <b>v2 plan</b>
+    <small>Draft for review &#183; 19 Nov 2026</small>
+  </div>
+  <a class="samples" href="https://counter-khata-preview.vercel.app/flows/">Samples</a>
+  <button class="theme" type="button" id="themeBtn" aria-label="Switch colour mode">Theme</button>
+</header>
+<main>
+  <p class="draft"><b>Draft for review &#183; 19 Nov 2026.</b> Nothing is built from this plan until it is approved. <a href="/">Back to the app</a> &#183; <a href="https://counter-khata-preview.vercel.app/flows/">Flow samples A, B and C</a></p>
+
+  <h1>Pharmacy app v2: the organised plan</h1>
+  <p class="lede">One plan for the next version of the app now called Counter Khata: first run, home, every flow, branding, and above all how the books stay safe. Nothing gets built until you say go.</p>
+
+  <nav class="toc" aria-label="Contents">
+    <strong>Contents</strong>
+    <ol>
+      <li><a href="#goal">Goal and release target</a></li>
+      <li><a href="#name">Name</a></li>
+      <li><a href="#first-run">First run</a></li>
+      <li><a href="#home">Home grid and screen map</a></li>
+      <li><a href="#flows">Core flows</a></li>
+      <li><a href="#appearance">Settings &#8250; Appearance</a></li>
+      <li><a href="#branding">Branding without a server</a></li>
+      <li><a href="#reliability">Data reliability</a></li>
+      <li><a href="#gaps">Gaps found in today&#8217;s code</a></li>
+      <li><a href="#decisions">Decisions</a></li>
+      <li><a href="#build">Build plan</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="goal">1. Goal and release target for v2</h2>
+  <p>v2 should be a pharmacy counter app a pharmacist is proud to open. It should be easy to learn in ten minutes, make a bill in four taps, and never lose or double a single rupee. It stays a free, single web app that works offline on the phone with no server, carries the shop&#8217;s own logo and colour on every bill, and keeps the books safe with automatic backup nudges and a checked restore. The target is one complete release, built in small tested steps on the preview, and switched live only after you&#8217;ve tried every flow on your phone and said go.</p>
+  <div class="props">
+    <div class="prop"><div class="k">Live today</div><div><span class="pill danger">pharmacy.vipulanand.in runs v1.1-footing, which has the new-client save bug</span></div></div>
+    <div class="prop"><div class="k">Preview</div><div><span class="pill success">One-line popup fix and three flow samples (A, B, C) are on the preview</span></div></div>
+    <div class="prop"><div class="k">This plan</div><div><span class="pill warning">Waiting for your review</span></div></div>
+    <div class="prop"><div class="k">Built for v2</div><div>Nothing yet, by design</div></div>
+  </div>
+
+  <h2 id="name">2. Name</h2>
+  <div class="wrap wide">
+    <table>
+      <thead><tr><th>Name</th><th>Meaning</th><th>How it sounds</th><th>Clash found (quick web search, 19 Nov)</th></tr></thead>
+      <tbody>
+        <tr><td>Aushadh</td><td>Sanskrit for medicine</td><td>Dignified and Indian; customers know the word</td><td>Close to the government&#8217;s Jan Aushadhi scheme. Existing: Aushadhi.io (a pharmacy billing app, same category), DrsAUSHADH (a Bengaluru pharmacy app) and an Aushadh medicine-search app</td></tr>
+        <tr><td>Dawakhana Pro</td><td>The pharmacy, made modern</td><td>Warm and local, but &#8216;dawakhana&#8217; also brings to mind hakim and Unani clinics</td><td>Dawaikhana.com, a medicine-ordering site for local chemists</td></tr>
+        <tr><td>RxLedger</td><td>Prescription sign plus account book</td><td>Modern and professional, in English</td><td>RxLedger.io is pharmacy sales and stock software. Same category, so a direct clash</td></tr>
+        <tr><td>Pharmora</td><td>A coined brand word for pharmacy</td><td>Crisp and upmarket; means nothing on its own</td><td>Pharmora Healthcare Pvt Ltd, a medicine maker in Baddi, plus a Pharmora pharmacy app in Nigeria</td></tr>
+        <tr><td>Vaidya Books</td><td>The healer&#8217;s accounts</td><td>Respected, but a vaidya is an Ayurvedic doctor, not a chemist</td><td>VaidyaOne sells pharmacy billing software in India</td></tr>
+        <tr><td>MediKhata Prime</td><td>Medicine khata, premium</td><td>Keeps the &#8216;khata&#8217; idea you find boring</td><td>MediKhata (doctors&#8217; practice software and a health-records app) and MedKhata (a pharmacy app in Bangladesh)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Every candidate has some clash. RxLedger and MediKhata clash worst because they&#8217;re the same kind of product. If none of them feels right, I&#8217;ll bring five fresh names, each checked on the Play Store, the App Store and the IP India trademark search. That search wasn&#8217;t done here. Renaming is safe for the books as long as the web address stays the same, because the phone keeps the data per web address (see gap 14).</p>
+  <div class="decision">
+    <div><div class="ttl">Your decision</div><div class="mute">Pick a name, or ask for a fresh, checked shortlist</div></div>
+    <span class="pill warning">Needs Vipul</span>
+  </div>
+
+  <h2 id="first-run">3. First run</h2>
+  <h3>Welcome cards (full screen, swipe)</h3>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Card</th><th>Headline</th><th>One line</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Your shop in your pocket</td><td>Bills, khata and stock live on this phone and work without internet</td></tr>
+        <tr><td>2</td><td>A bill in four taps</td><td>Pick the customer, tap the medicines, save and share on WhatsApp</td></tr>
+        <tr><td>3</td><td>Know who owes you</td><td>Every customer&#8217;s khata adds itself up, with one-tap reminders</td></tr>
+        <tr><td>4</td><td>Your name on every bill</td><td>Your logo, shop name and colour on the bill, the PDF and WhatsApp</td></tr>
+        <tr><td>5</td><td>Your books stay safe</td><td>A PIN for returns and changes, backups to WhatsApp or Drive, and nothing sent to any server</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The last card has two buttons, Create your shop and Try with example data, plus a Skip link on every card. On an iPhone, a card first asks you to tap Share and then Add to Home Screen. The iPhone keeps the home-screen app&#8217;s data apart from Safari&#8217;s, so a shop created in Safari wouldn&#8217;t show up in the installed app.</p>
+
+  <h3>Create your shop</h3>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Field</th><th>Required?</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Shop name</td><td>Required</td><td>Heads every bill, and switches the app out of example mode</td></tr>
+        <tr><td>Pharmacist or owner name</td><td>Required</td><td>Printed on bills as the registered pharmacist</td></tr>
+        <tr><td>Address</td><td>Required</td><td>A cash memo needs the shop&#8217;s address</td></tr>
+        <tr><td>Phone</td><td>Optional, recommended</td><td>Lets customers call or WhatsApp the shop</td></tr>
+        <tr><td>Drug licence number</td><td>Optional, recommended</td><td>Usually printed on a chemist&#8217;s bill. Its own field, not mixed into one line</td></tr>
+        <tr><td>GSTIN</td><td>Optional</td><td>Only if the shop is GST-registered</td></tr>
+        <tr><td>Logo</td><td>Optional</td><td>Shown in the app and on every bill (section 7)</td></tr>
+        <tr><td>Theme colour</td><td>Optional (default green)</td><td>The app&#8217;s own look (section 6)</td></tr>
+        <tr><td>Bill footer note</td><td>Optional</td><td>For example: Get well soon. Please check medicines before leaving.</td></tr>
+        <tr><td>PIN, typed twice</td><td>Required, 4 to 6 digits</td><td>Guards returns, voids, big discounts, restore and erase. There is no default PIN</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>After the shop is created</h3>
+  <ol class="steps">
+    <li><b>Choose where backups go</b> WhatsApp to yourself, Google Drive, or the phone only. It can be changed later.</li>
+    <li><b>First backup reminder</b> Comes at the end of the first day, or after the first 5 bills, whichever is sooner.</li>
+    <li><b>Example data, if chosen</b> A shop called &#8216;Example Medical Store&#8217; with a yellow EXAMPLE DATA band. One tap on &#8216;Clear example data and start my shop&#8217; removes all of it, PIN-free.</li>
+  </ol>
+
+  <h2 id="home">4. Home grid and screen map</h2>
+  <div class="homegrid">
+    <figure class="phone" aria-label="Sample C home screen with example data: today&#8217;s summary card and four big buttons">
+      <div class="exband">EXAMPLE DATA</div>
+      <div class="bar">
+        <div class="logo" aria-hidden="true">Ex</div>
+        <div class="shop">Example Medical Store</div>
+        <div class="dot" title="Backup health"></div>
+      </div>
+      <div class="summary">
+        <b>Today</b>
+        Bills and takings, and the total to collect
+      </div>
+      <div class="btns">
+        <span>New bill</span>
+        <span>Take payment</span>
+        <span>Who owes me</span>
+        <span>Add medicine</span>
+      </div>
+      <div class="today">
+        <div>Today&#8217;s bills</div>
+        <div>More: Reports, Stock, Shop, Backup, Help</div>
+      </div>
+      <figcaption class="mute" style="text-align:center;margin-top:8px;font-size:12px">Sample C, example data</figcaption>
+    </figure>
+    <ul>
+      <li>Top: shop logo and name in the theme colour, plus a backup health dot</li>
+      <li>Summary card: today&#8217;s bills and takings, and the total to collect</li>
+      <li>Four big buttons: New bill, Take payment, Who owes me, Add medicine</li>
+      <li>Today&#8217;s bills: send a bill again, take medicines back, or void</li>
+      <li>More: Reports, Stock list, Shop and appearance, Backup and restore, Help</li>
+      <li>Every job ends back at Home, and Back never loses a half-made bill</li>
+      <li>No bottom tab bar, so nothing can cover a Save button</li>
+    </ul>
+  </div>
+
+  <div class="map">
+    <svg viewBox="0 0 520 560" role="img" aria-labelledby="mapTitle mapDesc">
+      <title id="mapTitle">Screen map</title>
+      <desc id="mapDesc">Welcome cards lead to Create your shop or Example data, both to Home. From Home: New bill to Bill view and share to Return or void; Take payment; Who owes me, which can go to Take payment; Add medicine; Today&#8217;s bills to Bill view; and More for reports, shop, backup and help.</desc>
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z"/></marker>
+      </defs>
+      <rect class="bxt" x="175" y="8" rx="10" width="170" height="36"/>
+      <text class="tx txw" x="260" y="31">Welcome cards</text>
+
+      <path class="ln" d="M215 44 V66"/>
+      <path class="ln" d="M305 44 V66"/>
+
+      <rect class="bx" x="40" y="68" rx="10" width="170" height="36"/>
+      <text class="tx" x="125" y="91">Create your shop</text>
+      <rect class="bx" x="310" y="68" rx="10" width="170" height="36"/>
+      <text class="tx" x="395" y="91">Example data</text>
+
+      <path class="ln" d="M125 104 V148"/>
+      <text class="ed" x="125" y="138">first backup reminder</text>
+      <path class="ln" d="M395 104 V160 H347"/>
+      <path class="ln" d="M125 154 H173"/>
+
+      <rect class="bxh" x="175" y="160" rx="10" width="170" height="40"/>
+      <text class="tx" x="260" y="185">Home</text>
+
+      <path class="ln" d="M260 200 V214"/>
+      <path class="ln" d="M91 214 H429" style="marker-end:none"/>
+      <path class="ln" d="M91 214 V232"/>
+      <path class="ln" d="M260 214 V232"/>
+      <path class="ln" d="M429 214 V232"/>
+
+      <rect class="bx" x="16" y="234" rx="10" width="150" height="44"/>
+      <text class="tx" x="91" y="252">New bill</text>
+      <text class="ed" x="91" y="268">add customer in place</text>
+      <rect class="bx" x="185" y="234" rx="10" width="150" height="44"/>
+      <text class="tx" x="260" y="260">Take payment</text>
+      <rect class="bx" x="354" y="234" rx="10" width="150" height="44"/>
+      <text class="tx" x="429" y="252">Who owes me</text>
+      <text class="ed" x="429" y="268">customer khata</text>
+
+      <path class="ln" d="M91 278 V296"/>
+      <path class="ln" d="M260 278 V296"/>
+      <path class="ln" d="M429 278 V296"/>
+
+      <rect class="bx" x="16" y="298" rx="10" width="150" height="44"/>
+      <text class="tx" x="91" y="316">Add medicine</text>
+      <text class="ed" x="91" y="332">stock list</text>
+      <rect class="bx" x="185" y="298" rx="10" width="150" height="44"/>
+      <text class="tx" x="260" y="324">Today&#8217;s bills</text>
+      <rect class="bx" x="354" y="298" rx="10" width="150" height="44"/>
+      <text class="tx" x="429" y="316">More</text>
+      <text class="ed" x="429" y="332">reports, shop, backup, help</text>
+
+      <path class="ld" d="M354 256 H341"/>
+
+      <path class="ln" d="M91 342 V390"/>
+      <path class="ln" d="M260 342 V390 H173"/>
+
+      <rect class="bx" x="16" y="392" rx="10" width="170" height="36"/>
+      <text class="tx" x="101" y="415">Bill view and share</text>
+      <path class="ln" d="M101 428 V456"/>
+      <rect class="bx" x="16" y="458" rx="10" width="170" height="36"/>
+      <text class="tx" x="101" y="481">Return or void</text>
+    </svg>
+    <ol class="map-list">
+      <li>Welcome cards
+        <ul>
+          <li>Create your shop &#8594; first backup reminder &#8594; Home</li>
+          <li>Example data &#8594; Home</li>
+        </ul>
+      </li>
+      <li>Home
+        <ul>
+          <li>New bill (add customer in place) &#8594; Bill view and share &#8594; Return or void</li>
+          <li>Take payment</li>
+          <li>Who owes me (customer khata) &#8674; Take payment</li>
+          <li>Add medicine (stock list)</li>
+          <li>Today&#8217;s bills &#8594; Bill view and share</li>
+          <li>More: reports, shop, backup, help</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <details>
+    <summary>Mermaid source of the same map</summary>
+    <pre>flowchart TD
+  W[Welcome cards] --&gt; CS[Create your shop]
+  W --&gt; EX[Try with example data]
+  CS --&gt; BK1[First backup reminder] --&gt; H[Home]
+  EX --&gt; H
+  H --&gt; NB[New bill] --&gt; AC[Add customer in place] --&gt; NB
+  NB --&gt; BV[Bill view and share] --&gt; H
+  H --&gt; TP[Take payment] --&gt; H
+  H --&gt; WO[Who owes me] --&gt; KH[Customer khata]
+  KH --&gt; TP
+  H --&gt; AM[Add medicine] --&gt; ST[Stock list]
+  H --&gt; TB[Today's bills] --&gt; BV
+  BV --&gt; RV[Return or void]
+  H --&gt; MO[More]
+  MO --&gt; RP[Reports]
+  MO --&gt; SH[Shop and appearance]
+  MO --&gt; BR[Backup and restore]
+  MO --&gt; HP[Help]</pre>
+  </details>
+
+  <h2 id="flows">5. Core flows, step by step</h2>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Flow</th><th>Taps in v2</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>New bill, regular customer, 1 medicine, cash</td><td>4</td><td>Today it takes 7 to 9 taps</td></tr>
+        <tr><td>New bill with a new customer</td><td>5</td><td>The cart is kept</td></tr>
+        <tr><td>Take payment</td><td>3 to 4</td><td>Amount filled in with the full pending</td></tr>
+        <tr><td>See one customer&#8217;s khata</td><td>2</td><td></td></tr>
+        <tr><td>Add a medicine</td><td>2 plus typing</td><td></td></tr>
+        <tr><td>Return packs</td><td>4 plus quantities</td><td>PIN once every 5 minutes</td></tr>
+        <tr><td>Void a bill</td><td>4</td><td>Bill stays, crossed out</td></tr>
+        <tr><td>Today&#8217;s bills</td><td>1</td><td></td></tr>
+        <tr><td>Reports</td><td>2</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details open>
+    <summary>New bill (new customer added in place)</summary>
+    <ol class="steps">
+      <li><b>Home &#8250; New bill (1 tap)</b> Opens the one-screen bill from Sample A.</li>
+      <li><b>Customer (1 tap)</b> Type 2 or 3 letters and tap the name, or tap Walk-in. For someone new, tap + Add &#8216;Ramesh&#8217; (example name); the phone number is optional and the cart stays.</li>
+      <li><b>Medicines (1 tap each)</b> Search by name or salt and tap the medicine. Use + and &#8722; for strips or loose tablets. Low stock and expiry show beside each one.</li>
+      <li><b>Payment (0 to 1 tap)</b> Cash is already picked. Tap UPI, Part or Credit if needed. Walk-ins can&#8217;t go on credit.</li>
+      <li><b>Save and share (1 tap)</b> The button locks until the save finishes, then the bill image opens for WhatsApp. Changing the customer never empties the cart.</li>
+    </ol>
+  </details>
+
+  <details>
+    <summary>Take payment</summary>
+    <ol class="steps">
+      <li><b>Home &#8250; Take payment (1)</b> Or Take payment from inside a customer&#8217;s khata.</li>
+      <li><b>Pick the customer (1)</b> Their pending amount shows at once.</li>
+      <li><b>Amount</b> The full pending is filled in; edit it for a part payment. &#8216;Pending after&#8217; updates as you type.</li>
+      <li><b>Cash or UPI (0 to 1), then Save (1)</b> Locks against a double tap. You can share a receipt image.</li>
+    </ol>
+  </details>
+
+  <details>
+    <summary>Who owes me</summary>
+    <ol class="steps">
+      <li><b>Home &#8250; Who owes me (1)</b> The total to collect, and customers sorted by biggest due, with how many days since they last paid.</li>
+      <li><b>Tap a customer (1)</b> Their khata: bills, payments and returns with a running balance, plus refills due.</li>
+      <li><b>Actions</b> Take payment, send a WhatsApp reminder with the statement image, or make a month bill.</li>
+    </ol>
+  </details>
+
+  <details>
+    <summary>Add or edit medicine</summary>
+    <ol class="steps">
+      <li><b>Home &#8250; Add medicine (1)</b> Name, strength, pack (for example a strip of 10), MRP, stock and expiry. Salt and batch are optional.</li>
+      <li><b>Save (1)</b> The same duplicate check as today: no two medicines with the same name and strength.</li>
+      <li><b>Edit</b> More &#8250; Stock list &#8250; search &#8250; tap the medicine &#8250; change &#8250; Save. Price changes go in the audit trail.</li>
+    </ol>
+  </details>
+
+  <details>
+    <summary>Return or void</summary>
+    <ol class="steps">
+      <li><b>Open the bill (1)</b> From Today&#8217;s bills or the customer&#8217;s khata.</li>
+      <li><b>Return packs (1) &#8250; PIN &#8250; quantities &#8250; Save return (1)</b> Stock goes back on the shelf. The refund is at the price actually charged.</li>
+      <li><b>Or Void (1) &#8250; PIN &#8250; reason &#8250; Confirm (1)</b> The bill stays in the list, crossed out, with the reason. Its stock goes back, and any money taken with it is marked void. Nothing is ever deleted.</li>
+    </ol>
+  </details>
+
+  <details>
+    <summary>Today&#8217;s bills and Reports</summary>
+    <ol class="steps">
+      <li><b>Home &#8250; Today&#8217;s bills (1)</b> Number, time, customer, amount, and paid or credit. Tap one to share it again, return, void or edit. An edit keeps the old version.</li>
+      <li><b>More &#8250; Reports (2)</b> Today, Month or Financial year: sales, money collected, credit given, returns, discounts, top medicines, low stock and expiring soon. Download as Excel (CSV) or PDF.</li>
+    </ol>
+  </details>
+
+  <h2 id="appearance">6. Settings &#8250; Appearance</h2>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Setting</th><th>Choices</th><th>Where it shows</th></tr></thead>
+      <tbody>
+        <tr><td>Theme colour</td><td>6 presets: Pharmacy green, Royal blue, Maroon, Teal, Saffron, Charcoal. Or a custom colour</td><td>Top bar, big buttons, Save buttons and links in the app</td></tr>
+        <tr><td>Custom colour check</td><td>The app picks white or dark text on it automatically and refuses a colour too pale to read</td><td>Everywhere the theme colour is used</td></tr>
+        <tr><td>Mode</td><td>Light, Dark, or follow the phone</td><td>The app only. Bills always print on white</td></tr>
+        <tr><td>Bill style</td><td>Coloured header band, or plain black for thermal printers and photocopies</td><td>Bill view, PDF and WhatsApp image</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The theme is saved with the shop&#8217;s settings, so it&#8217;s included in backups and comes back on a new phone.</p>
+
+  <h2 id="branding">7. Branding and personalisation without a server</h2>
+  <div class="props">
+    <div class="prop"><div class="k">How the logo is kept</div><div>Resized on the phone to 256 px on the longest side and saved as a compressed image inside the shop&#8217;s settings in the phone&#8217;s own storage (IndexedDB). Today&#8217;s app already does this at 200 px.</div></div>
+    <div class="prop"><div class="k">Size cap</div><div>100 KB after compression. A bigger picture is shrunk automatically, and only refused if it still won&#8217;t fit.</div></div>
+    <div class="prop"><div class="k">Where it shows</div><div>The app&#8217;s top bar, the bill view, the PDF, and the WhatsApp bill image (drawn on the phone, as today&#8217;s <code>drawDoc</code> does)</div></div>
+    <div class="prop"><div class="k">Backups</div><div>Inside every backup file, so a new phone gets the logo back on restore</div></div>
+  </div>
+
+  <h3>What can and can&#8217;t be personalised</h3>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Per shop?</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>Logo, name, address, colours, footer on bills</td><td><span class="pill success">Yes</span></td><td>All drawn on the phone from the saved settings</td></tr>
+        <tr><td>App&#8217;s top bar and welcome</td><td><span class="pill success">Yes</span></td><td>Same</td></tr>
+        <tr><td>Browser tab title</td><td><span class="pill success">Yes</span></td><td>Set when the app opens</td></tr>
+        <tr><td>Home-screen icon and app name</td><td><span class="pill warning">No</span></td><td>The phone reads these from a fixed install file (the manifest) on the website. A per-shop manifest made on the phone is unreliable: Android may refuse to install it or ignore it, and iPhones read the icon only once, when the app is added.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ol>
+    <li>Recommended for now: one good generic app icon with the new app name. The shop&#8217;s logo shows the moment the app opens.</li>
+    <li>Later, for a shop that wants its own icon: a small static folder on the same web address with its own icon and name. Same web address, so the books stay the same.</li>
+    <li>Much later: a Play Store wrapper app. Deferred.</li>
+  </ol>
+
+  <h2 id="reliability">8. Data reliability</h2>
+  <div class="callout"><span class="lead">The most important section.</span> A billing app nobody trusts is a billing app nobody uses. Without a server, the books live on one phone, so v2 has to make losing them very hard and backing them up nearly effortless.</div>
+
+  <h3>What can wipe the books</h3>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Risk</th><th>What happens</th><th>v2 protection</th></tr></thead>
+      <tbody>
+        <tr><td>Phone low on space</td><td>The browser may clear the site&#8217;s storage</td><td>Ask the phone to keep the data (below). The backup nudge</td></tr>
+        <tr><td>Clear browsing data or site data</td><td>Everything for this web address is gone</td><td>A warning in Help. Backups</td></tr>
+        <tr><td>iPhone, used in Safari and not installed</td><td>Safari deletes site storage after 7 days of use without opening the site</td><td>Install to the home screen first, which is exempt. The welcome card asks for it</td></tr>
+        <tr><td>Lost, broken or changed phone</td><td>The books are on that phone only</td><td>Backups sent off the phone to WhatsApp or Drive, then restore on the new phone</td></tr>
+        <tr><td>App opened at a new web address</td><td>Starts empty, because storage belongs to the web address</td><td>Keep pharmacy.vipulanand.in. Move by backup if it ever changes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Ask the phone to keep the data</h3>
+  <p>Today&#8217;s app already asks with <code>navigator.storage.persist()</code> at start. v2 keeps that, asks again after installation, and shows the answer in plain words in Backup: &#8220;Protected from automatic clean-up&#8221;, or &#8220;Not protected yet. Install the app and keep backups.&#8221; Chrome usually says yes to an installed app. On an iPhone, installing is the protection.</p>
+
+  <h3>Automatic backups (as automatic as a server-free app can be)</h3>
+  <ul>
+    <li>Honest limit: a web app can&#8217;t run a backup by itself while it&#8217;s closed, so v2 nudges at the right moments</li>
+    <li>Backup dot on Home: green if backed up today, amber after 2 to 6 days, red after 7 or more</li>
+    <li>End-of-day nudge: after the last bill of the day, if anything changed since the last backup</li>
+    <li>One tap, Send backup: the phone&#8217;s share sheet opens with the file ready for WhatsApp to yourself or Drive. Download is the fallback</li>
+    <li>The file is named with the date, for example <code>shop-backup-2026-11-19.json</code>. It includes the logo and settings, never the PIN itself, only its hash</li>
+  </ul>
+
+  <h3>Restore and verify</h3>
+  <ol class="steps">
+    <li><b>Pick the file</b> The app checks it&#8217;s this app&#8217;s backup and which version wrote it.</li>
+    <li><b>Show what&#8217;s inside</b> Shop name, date, counts of customers, bills and medicines, the last bill number and the total pending.</li>
+    <li><b>Snapshot first</b> The current books are saved as a backup before anything is replaced.</li>
+    <li><b>Restore in one go</b> One storage transaction, as today: either all of it goes in or none of it does.</li>
+    <li><b>Verify</b> Recount and re-add the totals and compare with the file. Show &#8216;Restored and checked&#8217;, or exactly what differs.</li>
+  </ol>
+
+  <h3>Versions and migrations</h3>
+  <ul>
+    <li>Add a <code>schemaVersion</code> to the shop settings. Today there&#8217;s only a <code>v2: true</code> flag and the database is at version 1</li>
+    <li>Keep the database name <code>counter-khata</code> even after the rename, so existing books open as they are</li>
+    <li>v1 to v2 migration: add an audit store, bill revisions, an archived flag for customers, split <code>letterhead</code> into licence number and GSTIN, and add theme fields</li>
+    <li>Owed before any merge: a backup-compatibility test. Make example-data backups on v1.0 (<code>vipul</code>) and v1.1 (<code>v1.1-footing</code>), restore each into v2, and check every balance, bill total and stock count matches</li>
+  </ul>
+
+  <h3>Saving rules for money</h3>
+  <ul>
+    <li>Atomic saves: a bill, its stock changes, its payment and the bill number go into one transaction. Today&#8217;s <code>commit()</code> already does this; keep it</li>
+    <li>Double-tap lock on every Save: the button greys out until the save is done</li>
+    <li>Bill numbers never repeat and never gap: taken inside the same transaction, voided bills keep their number, nothing is deleted, and a restore can&#8217;t silently move numbers backwards</li>
+    <li>Money is kept in paise as whole numbers, as today, so there are no &#8377;0.01 drift errors</li>
+    <li>The discount limit needs the PIN, as today</li>
+    <li>Audit trail: every edit, void, return, price change and restore is logged and never changed. Returns and voids never delete history</li>
+  </ul>
+  <div class="eq">Line amount = <span class="frac"><span class="num">MRP &#215; units sold</span><span class="den">units per pack</span></span> &#8722; line discount</div>
+  <p>Example data: MRP &#8377;45.00 for a strip of 10, selling 15 tablets, gives &#8377;67.50. A 10% discount takes off &#8377;6.75, leaving &#8377;60.75. The bill total rounds to the nearest rupee, &#8377;61.00, and the bill shows the round-off of +&#8377;0.25.</p>
+
+  <h2 id="gaps">9. Gaps found in today&#8217;s code</h2>
+  <p>Found by reading <code>index.html</code> on <code>v1.1-footing</code> (4f03faf) and checking the live site.</p>
+  <div class="wrap wide">
+    <table>
+      <thead><tr><th>#</th><th>Gap</th><th>Severity</th><th>Proposed fix</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>The app links an install file (<code>manifest.webmanifest</code>) and registers an offline file (<code>sw.js</code>), but neither is in the repo. Both return 404 on the live site. So the app doesn&#8217;t open without internet, can&#8217;t install properly, and on an iPhone isn&#8217;t protected from the 7-day wipe</td><td><span class="pill danger">Critical</span></td><td>Add the two small files. This is the one exception to single-file, because browsers need them as separate files</td></tr>
+        <tr><td>2</td><td>Live publishes from <code>v1.1-footing</code>, where the bottom tab bar covers popup Save buttons, so a new client can&#8217;t be saved</td><td><span class="pill danger">Critical</span></td><td>The fix is ready on <code>fix/modal-above-nav</code> (8abb0c0), or switch Pages back to <code>vipul</code>. Waiting on your answer</td></tr>
+        <tr><td>3</td><td>No double-tap lock on Save bill, payment, client or return. A quick second tap can save two bills with the same number (<code>billSeq</code> is read before the first save finishes) and take the stock twice</td><td><span class="pill danger">High</span></td><td>Lock each button while it saves, and take the number inside the transaction</td></tr>
+        <tr><td>4</td><td>A backup only downloads to the phone&#8217;s own Downloads folder, so it&#8217;s lost with the phone. The reminder is a banner after 7 days</td><td><span class="pill danger">High</span></td><td>Share-sheet backup to WhatsApp or Drive, the Home backup dot, and the end-of-day nudge</td></tr>
+        <tr><td>5</td><td>Restore replaces everything without keeping a copy of the current books, ignores the file&#8217;s version number, and never checks the result</td><td><span class="pill danger">High</span></td><td>Snapshot first, check the version and migrate, then verify the counts and totals</td></tr>
+        <tr><td>6</td><td>No version or migration path: the database is at version 1 with only a <code>v2</code> flag</td><td><span class="pill danger">High</span></td><td><code>schemaVersion</code> plus tested migrations</td></tr>
+        <tr><td>7</td><td>Editing a bill or changing its amount overwrites it; only <code>editedAt</code> is kept. There&#8217;s no record of what it was before</td><td><span class="pill warning">Medium</span></td><td>Keep each bill&#8217;s revisions in an append-only audit store</td></tr>
+        <tr><td>8</td><td>Deleting a customer hard-deletes all their bills, payments, returns and refills (<code>deleteClientRecords</code>), leaving gaps in the bill numbers</td><td><span class="pill warning">Medium</span></td><td>Archive instead. Allow real deletion only for example data</td></tr>
+        <tr><td>9</td><td>The sample PIN 2580 is built in and comes back after Erase. Setting a PIN isn&#8217;t part of starting</td><td><span class="pill warning">Medium</span></td><td>A PIN is set during Create your shop. No default</td></tr>
+        <tr><td>10</td><td>Two open tabs each keep their own copy of the books, so both can hand out the same next bill number</td><td><span class="pill warning">Medium</span></td><td>A one-tab lock: a second tab shows &#8216;Already open in another tab&#8217;</td></tr>
+        <tr><td>11</td><td>Bills have no batch number or doctor&#8217;s name, and the licence number and GSTIN share one free-text line</td><td><span class="pill warning">Medium</span></td><td>Separate fields; batch optional on medicines. GST tax invoices are deferred</td></tr>
+        <tr><td>12</td><td>Saving the payment or amount forms doesn&#8217;t catch storage errors, so a failed save can look like nothing happened</td><td><span class="pill warning">Medium</span></td><td>One save helper that always says &#8216;Saved&#8217; or &#8216;Not saved, because&#8230;&#8217;</td></tr>
+        <tr><td>13</td><td>Practice mode is implied by a blank shop name (<code>isPractice</code>), which is confusing</td><td><span class="pill neutral">Low</span></td><td>An explicit Example data choice at first run</td></tr>
+        <tr><td>14</td><td>The data belongs to the web address and the database name <code>counter-khata</code>. A new domain for the new name would open empty</td><td><span class="pill neutral">Low</span></td><td>Keep the address and the database name. Rename on screen only</td></tr>
+        <tr><td>15</td><td>Stock can go below zero with only a short message</td><td><span class="pill neutral">Low</span></td><td>Keep it allowed, as real shops need, but add a &#8216;Needs recount&#8217; list</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="decisions">10. Decisions</h2>
+  <div class="wrap">
+    <table>
+      <thead><tr><th>Item</th><th>Status</th><th>Note</th></tr></thead>
+      <tbody>
+        <tr><td>Home grid based on Sample C</td><td><span class="pill success">Decided</span></td><td>You liked it</td></tr>
+        <tr><td>Books stay on the phone; no personal data sent anywhere</td><td><span class="pill success">Decided</span></td><td></td></tr>
+        <tr><td>Money in paise, shown in &#8377;; returns and voids never delete</td><td><span class="pill success">Decided</span></td><td></td></tr>
+        <tr><td>Name</td><td><span class="pill warning">Needs Vipul</span></td><td>Pick one, or ask for a checked shortlist</td></tr>
+        <tr><td>Pages branch for live</td><td><span class="pill warning">Needs Vipul</span></td><td>Switch back to <code>vipul</code> (v1.0, works), or push the one-line fix to <code>v1.1-footing</code>. Through the Chief of Staff</td></tr>
+        <tr><td>Keep it serverless</td><td><span class="pill warning">Needs Vipul</span></td><td>Recommended: yes for v2. It&#8217;s free and private, and backups cover the risk</td></tr>
+        <tr><td>Add the offline and install files</td><td><span class="pill warning">Needs Vipul</span></td><td>Two tiny files beside the single HTML file. Recommended</td></tr>
+        <tr><td>Sample A&#8217;s one-screen bill inside the C home</td><td><span class="pill warning">Needs Vipul</span></td><td>Recommended</td></tr>
+        <tr><td>Batch numbers on medicines</td><td><span class="pill warning">Needs Vipul</span></td><td>Optional field</td></tr>
+        <tr><td>Keep the web address pharmacy.vipulanand.in</td><td><span class="pill warning">Needs Vipul</span></td><td>Recommended, so the books are safe</td></tr>
+        <tr><td>GST tax invoices</td><td>Deferred</td><td>After v2</td></tr>
+        <tr><td>Cloud sync or two phones</td><td>Deferred</td><td>Would need a server</td></tr>
+        <tr><td>Per-shop home-screen icon</td><td>Deferred</td><td>Section 7, option 2</td></tr>
+        <tr><td>Sample B guided mode for a new helper</td><td>Deferred</td><td>Could be a Learn mode later</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="build">11. Build plan in small milestones</h2>
+  <p>Each milestone goes to the preview only. You try it on your phone, then I move to the next one. Status as of 19 Nov 2026: none started.</p>
+
+  <details>
+    <summary>M0. Safety fixes and the owed check</summary>
+    <ul class="check">
+      <li>Popup Save buttons can be tapped at 390&#215;844 and 360&#215;740</li>
+      <li>A double tap on every Save makes exactly one record</li>
+      <li>App opens in airplane mode after the first visit</li>
+      <li>Installs on Android Chrome and an iPhone home screen</li>
+      <li>v1.0 and v1.1 example backups restore with identical totals</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M1. Data layer v2</summary>
+    <ul class="check">
+      <li>v1 books migrate to v2 with no change to any balance</li>
+      <li>Bill edits keep the old version in the audit trail</li>
+      <li>Archiving a customer keeps all their bills and numbers</li>
+      <li>A second tab is blocked from saving</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M2. Backup and restore v2</summary>
+    <ul class="check">
+      <li>Send backup opens WhatsApp and Drive through the share sheet</li>
+      <li>Backup dot turns green, amber and red at the right ages</li>
+      <li>Restore makes a snapshot first and verifies the counts and totals</li>
+      <li>Logo and theme come back after a restore on a fresh browser</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M3. First run</summary>
+    <ul class="check">
+      <li>Five welcome cards swipe, and Skip works</li>
+      <li>Create your shop refuses to finish without the required fields and a PIN</li>
+      <li>Example data is clearly marked and clears in one tap</li>
+      <li>iPhone users are asked to install before creating the shop</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M4. Home and new bill</summary>
+    <ul class="check">
+      <li>A regular-customer bill takes 4 taps</li>
+      <li>Adding a new customer in place keeps the cart</li>
+      <li>Totals and round-off match the worked example</li>
+      <li>Nothing covers a Save button on either phone size</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M5. Payment, khata, today&#8217;s bills, return and void</summary>
+    <ul class="check">
+      <li>A payment updates the pending on Home and in the khata</li>
+      <li>A return puts stock back and refunds the charged price</li>
+      <li>A void keeps the bill, crossed out, with its number and reason</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M6. Appearance and branding</summary>
+    <ul class="check">
+      <li>All 6 presets and a custom colour read clearly in light and dark mode</li>
+      <li>Logo shows in the top bar, bill view, PDF and WhatsApp image</li>
+      <li>A 5 MB photo is shrunk under 100 KB</li>
+    </ul>
+  </details>
+  <details>
+    <summary>M7. Reports, rename, final review, then live</summary>
+    <ul class="check">
+      <li>Report totals match the sum of the bills for example data</li>
+      <li>New name everywhere on screen; the books open unchanged</li>
+      <li>Full gap review again on the preview</li>
+      <li>Your go before anything changes on pharmacy.vipulanand.in</li>
+    </ul>
+  </details>
+
+  <div class="decision">
+    <div>
+      <div class="ttl">Next step: Vipul approves this plan</div>
+      <div class="mute">Or tells me what to change. Nothing is built before that.</div>
+    </div>
+    <span class="pill warning">Waiting</span>
+  </div>
+
+  <footer>
+    <p><a href="/">Back to the app</a> &#183; <a href="https://counter-khata-preview.vercel.app/flows/">Flow samples</a></p>
+    <p>Draft for review &#183; 19 Nov 2026. This page is a plan, not the live app.</p>
+  </footer>
+</main>
+<script>
+(function(){
+  var root=document.documentElement;
+  var btn=document.getElementById("themeBtn");
+  var key="plan-theme";
+  function label(){
+    var t=root.getAttribute("data-theme");
+    btn.textContent=t==="dark"?"Light":t==="light"?"Dark":"Theme";
+  }
+  try{
+    var saved=localStorage.getItem(key);
+    if(saved==="light"||saved==="dark") root.setAttribute("data-theme",saved);
+  }catch(e){}
+  label();
+  btn.addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    var next;
+    if(cur==="dark") next="light";
+    else if(cur==="light") next="dark";
+    else next=window.matchMedia("(prefers-color-scheme: dark)").matches?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem(key,next)}catch(e){}
+    label();
+  });
+})();
+</script>
+</body>
+</html>
