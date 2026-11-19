@@ -11,6 +11,7 @@ It prints your shop details on every bill. Each client gets a neat, legible, ite
 | `/` (`index.html`) | The app |
 | `/guide/` | **Start here.** A step-by-step onboarding guide for first-time pharmacists |
 | `/howto/` | Help and FAQ for when you are stuck |
+| `/plan/` | v2 product plan (draft for review, 19 Nov 2026) |
 
 ## Guide
 
